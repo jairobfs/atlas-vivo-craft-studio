@@ -87,9 +87,9 @@ function atlas(){
  $('#canvas-open').onclick=showSpatialComposer;
  const audit=$('#audit-figures');if(audit)audit.onclick=showFigureAudit;
  $('#visual-edit').onclick=()=>{S.editorMode='edit';navigate('studio')};$('#print').onclick=()=>window.print();
- $('[data-zoom]').forEach(img=>img.onclick=()=>zoom(img.dataset.zoom,img.alt));
+ $$('[data-zoom]').forEach(img=>img.onclick=()=>zoom(img.dataset.zoom,img.alt));
  if(S.mode==='composed')requestAnimationFrame(scaleSpatialPreviews);
- $$('[data-map-jump]').forEach(b=>b.onclick=e=>{e.preventDefault();S.mode='atlas';atlas();document.getElementById(b.dataset.mapJump)?.scrollIntoView({behavior:'smooth'})});
+ $$$('[data-map-jump]').forEach(b=>b.onclick=e=>{e.preventDefault();S.mode='atlas';atlas();document.getElementById(b.dataset.mapJump)?.scrollIntoView({behavior:'smooth'})});
  const prev=$('#previous-slide'),next=$('#next-slide');if(prev)prev.onclick=()=>{S.presentationIndex=Math.max(0,S.presentationIndex-1);atlas()};if(next)next.onclick=()=>{S.presentationIndex=Math.min(S.project.sections.length-1,S.presentationIndex+1);atlas()};
 }
 function showFigureAudit(){
