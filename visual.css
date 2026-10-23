@@ -51,3 +51,12 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:var(--ink)
 .control-options span{font-size:11px;letter-spacing:.2px;color:var(--muted)}
 .control-options strong{font-size:16px;color:var(--ink)}
 @media(max-width:500px){.control-options{grid-template-columns:1fr}.control-hero .actions{display:grid}.control-hero .actions .btn{width:100%}}
+
+/* The owner changes density through one native Craft note; no CSS editing is required. */
+.atlas-density-compact .prancha,.atlas-density-compact .va-section{padding:15px 18px}
+.atlas-density-compact .atlas-stack,.atlas-density-compact .va-story{gap:11px}
+.atlas-density-compact .va-ledger-item{padding:9px 0}
+.atlas-density-spacious .prancha,.atlas-density-spacious .va-section{padding:36px 40px}
+.atlas-density-spacious .atlas-stack,.atlas-density-spacious .va-story{gap:28px}
+.atlas-density-spacious .va-ledger-item{padding:23px 0}
+@media(max-width:720px){.atlas-density-spacious .prancha,.atlas-density-spacious .va-section{padding:23px 18px}.atlas-density-compact .prancha,.atlas-density-compact .va-section{padding:12px}}
