@@ -141,6 +141,64 @@ export default async function handler(req, res) {
         body: JSON.stringify({ markdown, position: { pageId: b.documentId, position: 'end' } }),
       }));
     }
+
+    if (op === 'layout' || op === 'layout-save') {
+      const rootId = process.env.ATLAS_LAYOUT_ROOT_ID;
+      const targetId = op === 'layout' ? u.searchParams.get('documentId') : (await input(req)).documentId;
+      if (!validId(rootId) || !validId(targetId)) {
+        return json(res, 503, { error: 'Configuração editorial do Craft não está ativa' });
+      }
+      const rootData = await craft('/blocks?id=' + encodeURIComponent(rootId) + '&maxDepth=1');
+      const page = Array.isArray(rootData.data) ? rootData.data[0] : Array.isArray(rootData.items) ? rootData.items[0] : (rootData.data || rootData);
+      const entries = Array.isArray(page?.content) ? page.content : [];
+      const prefix = 'ATLAS-VIVO-LAYOUT ' + targetId + ' ';
+      const existing = entries.find(block => String(block.markdown || '').startsWith(prefix));
+      const parseSaved = () => {
+        if (!existing) return null;
+        try {
+          const stored = JSON.parse(String(existing.markdown).slice(prefix.length));
+          return stored && typeof stored === 'object' ? stored : null;
+        } catch { return null; }
+      };
+      if (op === 'layout') {
+        if (req.method !== 'GET') return json(res, 405, { error: 'Método inválido' });
+        return json(res, 200, { documentId: targetId, config: parseSaved(), source: 'craft' });
+      }
+      if (req.method !== 'POST') return json(res, 405, { error: 'Método inválido' });
+      // Re-read the JSON body through req.body; if streamed it is cached by Vercel.
+      const payload = typeof req.body === 'object' ? req.body : await input(req);
+      const cfg = payload.config;
+      if (!cfg || typeof cfg !== 'object' || !Array.isArray(cfg.order) || cfg.order.length > 150) {
+        return json(res, 400, { error: 'Composição visual inválida' });
+      }
+      const validLayouts = new Set(['editorial','panorama','mosaic','spotlight','story']);
+      const normalized = {
+        version: 1,
+        layout: validLayouts.has(cfg.layout) ? cfg.layout : 'editorial',
+        density: ['compact','balanced','expanded'].includes(cfg.density) ? cfg.density : 'balanced',
+        order: cfg.order.filter(x => x && typeof x === 'object').map((x,i) => ({
+          source: limited(x.source || x.key, 120),
+          title: limited(x.title, 180),
+          display: ['full','half','feature','hidden'].includes(x.display) ? x.display : 'full',
+          order: i
+        })).filter(x => x.source),
+        updatedAt: new Date().toISOString()
+      };
+      const markdown = prefix + JSON.stringify(normalized);
+      let result;
+      if (existing?.id) {
+        result = await craft('/blocks', {
+          method: 'PUT',headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({blocks:[{id:existing.id,markdown}]})
+        });
+      } else {
+        result = await craft('/blocks', {
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({markdown,position:{pageId:rootId,position:'end'}})
+        });
+      }
+      return json(res, 200, { ok:true,documentId:targetId,config:normalized,storedIn:'Craft',changedBlocks:Boolean(result) });
+    }
     if (op === 'upload' && req.method === 'POST') {
       const id = u.searchParams.get('id');
       const position = u.searchParams.get('position') || 'end';
