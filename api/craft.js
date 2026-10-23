@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { parseControlDocument, safeControl, filterLibrary } from './atlas-control.js';
 
 // The Craft connection is stored as an encrypted server-side Vercel environment variable.
 // Do not place the private connection URL in browser-side scripts.
@@ -10,15 +11,16 @@ function json(res, code, data) {
   res.end(JSON.stringify(data));
 }
 const accessKey = () => process.env.APP_ACCESS_KEY || '';
-const sessionToken = () => createHmac('sha256', accessKey()).update('atlas-vivo:session:v1').digest('hex');
+const ownerKey = (control) => control?.accessCode || accessKey();
+const sessionToken = (control) => createHmac('sha256', accessKey()).update('atlas-vivo:session:v2:' + ownerKey(control)).digest('hex');
 function same(a, b) {
   const left = Buffer.from(String(a || '')), right = Buffer.from(String(b || ''));
   return left.length === right.length && timingSafeEqual(left, right);
 }
-function authenticated(req) {
+function authenticated(req,control) {
   const cookie = (req.headers.cookie || '').split(';').map(x => x.trim())
     .find(x => x.startsWith('av_session='))?.slice('av_session='.length);
-  return Boolean(accessKey()) && same(cookie, sessionToken());
+  return Boolean(accessKey()) && same(cookie, sessionToken(control));
 }
 function base() {
   try {
@@ -55,28 +57,53 @@ async function craft(path, options = {}) {
   }
   return data;
 }
+async function readCraftControl() {
+  const id = process.env.ATLAS_CONTROL_ROOT_ID;
+  if (!validId(id)) return null;
+  const data = await craft('/blocks?id=' + encodeURIComponent(id) + '&maxDepth=1');
+  return parseControlDocument(data);
+}
+
 export default async function handler(req, res) {
   try {
     const u = new URL(req.url, 'https://localhost');
     const op = u.searchParams.get('op') || 'status';
+    // This private Craft note controls access and appearance without a deployment.
+    let control = null, controlError = false;
+    try { control = await readCraftControl(); }
+    catch { controlError = true; }
     if (op === 'status') {
-      return json(res, 200, { configured: Boolean(base()), authenticated: authenticated(req) });
+      return json(res, 200, { configured: Boolean(base()), authenticated: authenticated(req,control), controlReady: Boolean(control), controlError });
     }
     if (op === 'login') {
       if (req.method !== 'POST') return json(res, 405, { error: 'Método não permitido' });
       const body = await input(req);
-      if (!accessKey() || !same(body.password, accessKey())) return json(res, 401, { error: 'Código incorreto' });
+      if (!accessKey() || !same(body.password, ownerKey(control))) return json(res, 401, { error: 'Código incorreto' });
       const secure = process.env.VERCEL || req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : '';
-      res.setHeader('Set-Cookie', 'av_session=' + sessionToken() + '; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800' + secure);
+      const maxAge = Math.min(90, Math.max(1, control?.sessionDays || 30)) * 86400;
+      res.setHeader('Set-Cookie', 'av_session=' + sessionToken(control) + '; HttpOnly; SameSite=Strict; Path=/; Max-Age=' + maxAge + secure);
       return json(res, 200, { ok: true });
     }
     if (op === 'logout') {
       res.setHeader('Set-Cookie', 'av_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0; Secure');
       return json(res, 200, { ok: true });
     }
-    if (!authenticated(req)) return json(res, 401, { error: 'Entre com a senha do Studio' });
+    if (!authenticated(req,control)) return json(res, 401, { error: 'Entre com o código configurado no Craft' });
+    if (op === 'control' && req.method === 'GET') return json(res, 200, {
+      ...safeControl(control), controlError,
+      craftUrl: 'https://docs.craft.do/editor/d/c3b34bfd-9b77-6809-f4d0-a206276df43a/3dac343a-bb21-81b7-db40-70de6fd8a51f'
+    });
+    if (op === 'catalog' && req.method === 'GET') return json(res, 200, await craft('/documents?fetchMetadata=true'));
+    const mutatingOps = new Set(['create','update','append','visual','layout-save','composition-save','upload']);
+    if (control && control.editingEnabled === false && mutatingOps.has(op)) {
+      return json(res, 403, { error: 'Edição desativada na Central de Controle do Craft' });
+    }
+    if (control && control.creationEnabled === false && op === 'create') {
+      return json(res, 403, { error: 'Criação de notas desativada na Central de Controle' });
+    }
     if (op === 'connection' && req.method === 'GET') return json(res, 200, await craft('/connection'));
-    if (op === 'documents' && req.method === 'GET') return json(res, 200, await craft('/documents?fetchMetadata=true'));
+    if (op === 'documents' && req.method === 'GET')
+      return json(res, 200, filterLibrary(await craft('/documents?fetchMetadata=true'), control));
     if (op === 'document' && req.method === 'GET') {
       const id = u.searchParams.get('id');
       if (!validId(id)) return json(res, 400, { error: 'ID de documento inválido' });
@@ -85,7 +112,7 @@ export default async function handler(req, res) {
     if (op === 'search' && req.method === 'GET') {
       const q = limited(u.searchParams.get('q'), 120).trim();
       if (q.length < 2) return json(res, 400, { error: 'Pesquisa muito curta' });
-      return json(res, 200, await craft('/documents/search?include=' + encodeURIComponent(q)));
+      return json(res, 200, filterLibrary(await craft('/documents/search?include=' + encodeURIComponent(q)), control));
     }
     if (op === 'create' && req.method === 'POST') {
       const b = await input(req);
