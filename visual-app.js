@@ -3,8 +3,8 @@ import {openVisualComposer,orderedVisualSections} from './visual-composer.js';
 import {openSpatialComposer,renderSpatialDocument,scaleSpatialPreviews} from './spatial-composer.js';
 import {renderImmersiveAtlas,bindImmersiveAtlas} from './immersive-atlas.js';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'immersive',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false,layoutConfig:null,composer:null,spatial:null};
-const menu=[['home','Painel'],['library','Biblioteca'],['atlas','Atlas visual'],['studio','Estúdio']];
+let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'immersive',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false,layoutConfig:null,composer:null,spatial:null,settings:null};
+const menu=[['home','Painel'],['library','Biblioteca'],['atlas','Atlas visual'],['studio','Estúdio'],['control','Controle Craft']];
 async function API(op,args={},data){
  const u=new URL('/api/craft',location.href);u.searchParams.set('op',op);
  for(const [k,v] of Object.entries(args))u.searchParams.set(k,v);
@@ -13,19 +13,20 @@ async function API(op,args={},data){
 }
 function inform(v){const el=$('#toast');el.textContent=String(v);el.classList.remove('hide');clearTimeout(inform.t);inform.t=setTimeout(()=>el.classList.add('hide'),3800)}
 function navigate(p){S.tab=p;if(p==='atlas'&&!S.project&&S.auth){S.doc=demo();S.project=compile(S.doc);S.demo=true};updateNav();render();window.scrollTo(0,0)}
-function updateNav(){for(const el of $$('.nav-target'))el.innerHTML=menu.map(([p,l])=>'<button data-nav="'+p+'" class="'+(S.tab===p?'active':'')+'">'+l+'</button>').join('');$$('[data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav));$('#crumb').textContent='ATLAS VIVO / '+({home:'Painel',library:'Biblioteca',atlas:'Atlas Visual',studio:'Estúdio'}[S.tab]||S.tab)}
+function updateNav(){for(const el of $$('.nav-target'))el.innerHTML=menu.map(([p,l])=>'<button data-nav="'+p+'" class="'+(S.tab===p?'active':'')+'">'+l+'</button>').join('');$$('[data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav));$('#crumb').textContent='ATLAS VIVO / '+({home:'Painel',library:'Biblioteca',atlas:'Atlas Visual',studio:'Estúdio',control:'Controle Craft'}[S.tab]||S.tab)}
 function documentCard(d){const key=id(d);return '<button class="tile" data-doc="'+esc(key)+'"><div class="eyebrow">DOCUMENTO NATIVO · CRAFT</div><h3>'+esc(title(d))+'</h3><p>Visualizar em pranchas, editar conteúdo e explorar conceitos</p><div class="footer-note">Abrir atlas →</div></button>'}
 function bindCards(){$$('[data-doc]').forEach(b=>b.onclick=()=>openDoc(b.dataset.doc))}
 function landing(){
  const cards=S.docs.slice(0,6);
- $('#screen').innerHTML='<div class="hero"><div class="eyebrow">ATLAS VIVO · COLORHUB × UNIVERSO</div><h1>O Craft edita.<br>O atlas interpreta.</h1><p>Pranchas científicas, comparações, imagens reais, diagramas e recuperação ativa. Sem substituir suas notas por uma cópia estática.</p><div class="actions"><button class="btn primary" id="browse">Abrir biblioteca →</button><button class="btn" id="example">Explorar exemplo visual</button><button class="btn" id="sync">Sincronizar Craft</button></div></div>'+
+ $('#screen').innerHTML='<div class="hero"><div class="eyebrow">ATLAS VIVO · COLORHUB × UNIVERSO</div><h1>'+esc(S.settings?.appTitle||'ATLAS VIVO')+'<br>Craft e ciência em uma experiência.</h1><p>'+esc(S.settings?.opening||'Pranchas científicas, comparações, imagens reais, diagramas e recuperação ativa.')+'</p><div class="actions"><button class="btn primary" id="browse">Abrir biblioteca →</button><button class="btn" id="example">Explorar exemplo visual</button><button class="btn" id="sync">Sincronizar Craft</button></div></div>'+
  '<div class="stats"><div class="panel"><div class="eyebrow">BIBLIOTECA CRAFT</div><div class="stat-value">'+S.docs.length+'</div><div class="muted mini">Notas consultáveis no seu espaço</div></div><div class="panel"><div class="eyebrow">PONTOS DE EDIÇÃO</div><div class="stat-value">2 vias</div><div class="muted mini">Craft ↔ interface visual</div></div></div><div class="section-top"><h2>Notas recentes</h2><button class="btn small" id="more">Ver todas</button></div>'+
  '<div class="grid">'+cards.map(documentCard).join('')+'</div>';
  $('#browse').onclick=$('#more').onclick=()=>navigate('library');$('#example').onclick=()=>{S.doc=demo();S.project=compile(S.doc);S.demo=true;S.layoutConfig=null;S.docId='';navigate('atlas')};$('#sync').onclick=sync;bindCards();
 }
 function library(){
  let docs=S.docs.filter(d=>title(d).toLowerCase().includes(S.filter.toLowerCase()));
- $('#screen').innerHTML='<div class="section-top"><div><div class="eyebrow">CONTEÚDO FONTE · CRAFT</div><h1>Biblioteca viva</h1></div><button id="sync" class="btn">Sincronizar</button></div><input class="field" id="search" placeholder="Pesquise por título..." value="'+esc(S.filter)+'"><div class="mini muted" id="result-count">'+docs.length+' documentos · clique para construir a visualização</div><div id="cards" class="grid" style="margin-top:16px">'+docs.map(documentCard).join('')+'</div>';
+ $('#screen').innerHTML='<div class="section-top"><div><div class="eyebrow">CONTEÚDO FONTE · CRAFT</div><h1>Biblioteca viva</h1></div><div class="actions"><button id="manage-library" class="btn small outline">Escolher notas no Craft</button><button id="sync" class="btn">Sincronizar</button></div></div><input class="field" id="search" placeholder="Pesquise por título..." value="'+esc(S.filter)+'"><div class="mini muted" id="result-count">'+docs.length+' documentos · clique para construir a visualização</div><div id="cards" class="grid" style="margin-top:16px">'+docs.map(documentCard).join('')+'</div>';
+ $('#manage-library').onclick=()=>navigate('control');
  $('#sync').onclick=sync;$('#search').oninput=e=>{S.filter=e.target.value;let v=S.docs.filter(d=>title(d).toLowerCase().includes(S.filter.toLowerCase()));$('#cards').innerHTML=v.map(documentCard).join('');$('#result-count').textContent=v.length+' documentos';bindCards()};bindCards();
 }
 function craftURL(){
@@ -174,14 +175,47 @@ function studio(){
   $('#create-visual').onclick=async()=>{let b=$('#create-visual');b.disabled=true;try{let data=$('#new-body').value.trim(),name=$('#new-name').value.trim();if(!name||!data)throw Error('Preencha título e conteúdo');let v=current==='flow'?'Fluxo: '+data:current==='compare'?'Comparação: '+data:current==='question'?'Pergunta: '+data:current==='callout'?'<callout>'+data+'</callout>':data;await API('visual',{}, {documentId:S.docId,blocks:[{markdown:'## '+name},{markdown:v}]});await openDoc(S.docId);inform('Nova prancha criada no Craft')}catch(e){$('#create-state').textContent=e.message}finally{b.disabled=false}};
  }
 }
+function controlPanel(){
+ const c=S.settings||{};
+ const url=c.craftUrl||'https://docs.craft.do/editor/d/c3b34bfd-9b77-6809-f4d0-a206276df43a/3dac343a-bb21-81b7-db40-70de6fd8a51f';
+ const notes=Array.isArray(c.visibleNotes)?c.visibleNotes:[];
+ const noteList=notes.length?notes.map((n,i)=>'<div class="control-row"><span class="eyebrow">'+String(i+1).padStart(2,'0')+'</span><strong>'+esc(n)+'</strong></div>').join(''):'<div class="muted mini">Nenhuma seleção definida. Adicione blocos Exibir: título no Craft.</div>';
+ $('#screen').innerHTML='<div class="hero control-hero"><div class="eyebrow">ATLAS VIVO · ADMINISTRAÇÃO CRAFT-FIRST</div><h1>Seu aplicativo. Suas regras. Tudo no Craft.</h1><p>Aqui você visualiza as definições ativas. A edição acontece diretamente numa nota normal do Craft, sem GitHub, backup, API ou programação.</p><div class="actions"><a class="btn primary" target="_blank" rel="noopener" href="'+esc(url)+'">Abrir Central de Controle no Craft ↗</a><button id="control-refresh" class="btn">Recarregar configurações</button></div></div>'+
+ '<div class="stats"><div class="panel"><div class="eyebrow">ACESSO</div><h2>Alterável no Craft</h2><p class="muted mini">Edite o campo Código de acesso. A chave não é exibida no painel público do site.</p><span class="chip">'+(c.sessionDays||30)+' dias de sessão</span></div>'+
+ '<div class="panel"><div class="eyebrow">BIBLIOTECA</div><h2>'+(c.libraryMode==='selected'?'Somente notas escolhidas':'Todas as notas acessíveis')+'</h2><p class="muted mini">Reorganize as linhas Exibir na nota Craft para mudar a ordem dos documentos.</p><span class="chip">'+S.docs.length+' notas visíveis</span></div></div>'+
+ '<div class="panel" style="margin-top:16px"><div class="section-top" style="margin-top:0"><h2>Documentos publicados</h2><span class="chip">'+notes.length+' selecionados</span></div>'+noteList+'</div>'+
+ '<div class="panel"><div class="eyebrow">EXPERIÊNCIA VISUAL</div><div class="control-options"><div><span>Entrada</span><strong>'+(c.home==='library'?'Biblioteca':'Painel')+'</strong></div><div><span>Visualização</span><strong>'+esc(c.view||'imersivo')+'</strong></div><div><span>Tema</span><strong>'+esc(c.theme||'dark')+'</strong></div><div><span>Densidade</span><strong>'+esc(c.density||'balanced')+'</strong></div><div><span>Atualizar ao abrir</span><strong>'+(c.autoRefresh?'Sim':'Não')+'</strong></div><div><span>Editar conteúdos</span><strong>'+(c.editingEnabled?'Permitido':'Desativado')+'</strong></div></div></div>'+
+ '<div class="notice">Como usar: toque em <strong>Abrir Central de Controle</strong>, altere qualquer valor da nota e volte aqui em <strong>Recarregar configurações</strong>. As próximas leituras da biblioteca usarão sua seleção.</div>';
+ $('#control-refresh').onclick=async()=>{await sync();controlPanel();inform('Configurações recuperadas do Craft')};
+}
+
 function login(){
  $('#screen').innerHTML='<div class="login"><div class="eyebrow">ATLAS VIVO · ACESSO PRIVADO</div><h1>Estudo visual conectado ao Craft.</h1><p class="muted">Conexão e credenciais permanecem no servidor. A biblioteca só é carregada depois do login.</p><div class="panel"><label for="key">Código de acesso</label><input id="key" type="password" class="field" autocomplete="current-password" placeholder="Digite o código privado"><button class="btn primary" id="enter" style="width:100%">Entrar no Studio</button><button class="btn outline" id="preview" style="width:100%;margin-top:10px">Conhecer atlas visual de demonstração</button><div id="err" class="mini muted"></div></div></div>';
  $('#preview').onclick=()=>{S.demo=true;S.auth=true;S.docs=[];S.doc=demo();S.docId='';S.project=compile(S.doc);S.mode='atlas';navigate('atlas')};
- $('#enter').onclick=async()=>{let b=$('#enter');b.disabled=true;try{await API('login',{}, {password:$('#key').value});S.auth=true;await sync();navigate('home')}catch(e){$('#err').textContent=e.message}finally{b.disabled=false}};$('#key').onkeydown=e=>{if(e.key==='Enter')$('#enter').click()};
+ $('#enter').onclick=async()=>{let b=$('#enter');b.disabled=true;try{await API('login',{}, {password:$('#key').value});S.auth=true;await sync();navigate(S.settings?.home||'home')}catch(e){$('#err').textContent=e.message}finally{b.disabled=false}};$('#key').onkeydown=e=>{if(e.key==='Enter')$('#enter').click()};
 }
-function render(){$('#logout').classList.toggle('hide',!S.auth);if(!S.auth)return login();if(S.tab==='home')landing();else if(S.tab==='library')library();else if(S.tab==='atlas')atlas();else studio()}
-async function sync(){if(S.loading)return;S.loading=true;try{const [d,c]=await Promise.all([API('documents'),API('connection')]);S.docs=list(d);S.connection=c;render();inform(S.docs.length+' documentos carregados do Craft')}catch(e){inform('Craft: '+e.message)}finally{S.loading=false}}
-async function openDoc(documentId,preserveMode=false){if(!documentId)return;const previous=S.mode;try{const d=await API('document',{id:documentId});S.doc=d;S.docId=documentId;S.project=compile(d);S.demo=false;S.mode=preserveMode?previous:'immersive';try{const layout=await API('layout',{documentId});S.layoutConfig=layout.config||null}catch(err){S.layoutConfig=null;console.warn('Layout unavailable',String(err.message||err))}navigate('atlas')}catch(e){inform('Falha ao abrir documento: '+e.message)}}
+function render(){$('#logout').classList.toggle('hide',!S.auth);if(!S.auth)return login();if(S.tab==='home')landing();else if(S.tab==='library')library();else if(S.tab==='atlas')atlas();else if(S.tab==='control')controlPanel();else studio()}
+function applyControlOptions(){
+ const conf=S.settings;if(!conf)return;
+ document.body.classList.toggle('light',conf.theme==='light');
+ const tagline=document.querySelector('.tagline');if(tagline)tagline.textContent=conf.subtitle||'ColorHub × Craft Studio';
+ document.title=(conf.appTitle||'ATLAS VIVO')+' · Craft Studio';
+}
+async function sync(){
+ if(S.loading)return;
+ S.loading=true;
+ try{
+   const [d,conn,control]=await Promise.allSettled([API('documents'),API('connection'),API('control')]);
+   if(d.status!=='fulfilled')throw d.reason;
+   S.docs=list(d.value);
+   if(conn.status==='fulfilled')S.connection=conn.value;
+   if(control.status==='fulfilled'){S.settings=control.value;applyControlOptions()}
+   else inform('Biblioteca carregada; controles do Craft indisponíveis temporariamente');
+   render();inform(S.docs.length+' documentos na biblioteca selecionada');
+ }catch(e){inform('Craft: '+e.message)}
+ finally{S.loading=false}
+}
+async function openDoc(documentId,preserveMode=false){if(!documentId)return;const previous=S.mode;try{const d=await API('document',{id:documentId});S.doc=d;S.docId=documentId;S.project=compile(d);S.demo=false;S.mode=preserveMode?previous:(S.settings?.view||'immersive');try{const layout=await API('layout',{documentId});S.layoutConfig=layout.config||null}catch(err){S.layoutConfig=null;console.warn('Layout unavailable',String(err.message||err))}navigate('atlas')}catch(e){inform('Falha ao abrir documento: '+e.message)}}
 $('#theme').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('atlas-theme',document.body.classList.contains('light')?'light':'dark')};
 if(S.theme==='light')document.body.classList.add('light');
 $('#logout').onclick=async()=>{if(!S.demo){try{await API('logout')}catch{}}S.demo=false;S.auth=false;S.doc=null;S.project=null;S.docs=[];navigate('home')};
@@ -196,6 +230,6 @@ function refreshOnReturn(){
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshOnReturn()});
 window.addEventListener('focus',refreshOnReturn);
-updateNav();(async()=>{if(new URLSearchParams(location.search).get('demo')==='1'){S.auth=true;S.demo=true;S.docs=[];S.doc=demo();S.docId='';S.project=compile(S.doc);S.mode='immersive';navigate('atlas');return}try{const st=await API('status');S.auth=!!st.authenticated;if(S.auth)await sync();render()}catch{render()}})();
+updateNav();(async()=>{if(new URLSearchParams(location.search).get('demo')==='1'){S.auth=true;S.demo=true;S.docs=[];S.doc=demo();S.docId='';S.project=compile(S.doc);S.mode='immersive';navigate('atlas');return}try{const st=await API('status');S.auth=!!st.authenticated;if(S.auth){await sync();S.tab=S.settings?.home||'home';updateNav()}render()}catch{render()}})();
 
 window.addEventListener('resize',scaleSpatialPreviews);
