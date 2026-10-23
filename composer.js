@@ -1,5 +1,5 @@
 import {flat,raw,kind,level,title,image,rows,steps,sides,esc,rich,compile} from './visual-core.js';
-const W=1100,H=735,PREFIX='ATLAS_VIVO_LAYOUT_V1:';
+const W=1100,H=619,PREFIX='ATLAS_VIVO_LAYOUT_V1:';
 const $=(s,root=document)=>root.querySelector(s),$$=(s,root=document)=>[...root.querySelectorAll(s)];
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 const id=()=>('v'+Math.random().toString(36).slice(2,9));
@@ -19,10 +19,10 @@ function starter(doc){
    subset.forEach((it,index)=>{
     const hero=it.kind==='heading',img=it.kind==='image';
     const dims=[
-     {x:40,y:78,w:640,h:225},
-     {x:710,y:78,w:350,h:225},
-     {x:40,y:328,w:520,h:342},
-     {x:580,y:328,w:480,h:342}
+     {x:40,y:65,w:640,h:200},
+     {x:710,y:65,w:350,h:200},
+     {x:40,y:284,w:520,h:285},
+     {x:580,y:284,w:480,h:285}
     ][index];
     slide.nodes.push({uid:id(),sourceId:it.block.id,kind:it.kind,x:dims.x,y:dims.y,w:dims.w,h:dims.h,design:styleFor(it.kind),accent:'#56c9c7'});
    });
@@ -207,7 +207,7 @@ export function mountComposer(ctx){
   $('#add-board',target).onclick=()=>{if(layout.boards.length>=30)return;layout.boards.push({uid:id(),name:'Nova prancha',skin:'dark',nodes:[]});boardIndex=layout.boards.length-1;selected=null;schedule();draw()};
   $('#remove-board',target).onclick=()=>{if(layout.boards.length===1){state('Mantenha pelo menos uma prancha','error');return}layout.boards.splice(boardIndex,1);boardIndex=clamp(boardIndex,0,layout.boards.length-1);selected=null;schedule();draw()};
   $('#zoom-mode',target).onclick=()=>{zoomMode=zoomMode==='fit'?'actual':'fit';$('#zoom-mode',target).textContent=zoomMode==='fit'?'100%':'Ajustar';setDimensions()};
-  $('#reset-board',target).onclick=()=>{getBoard().nodes.forEach((n,i)=>{const coords=[{x:40,y:78,w:630,h:225},{x:690,y:78,w:370,h:225},{x:40,y:325,w:510,h:348},{x:570,y:325,w:490,h:348}][i%4];Object.assign(n,coords)});schedule();draw()};
+  $('#reset-board',target).onclick=()=>{getBoard().nodes.forEach((n,i)=>{const coords=[{x:40,y:65,w:630,h:200},{x:690,y:65,w:370,h:200},{x:40,y:284,w:510,h:285},{x:570,y:284,w:490,h:285}][i%4];Object.assign(n,coords)});schedule();draw()};
   const observe=new ResizeObserver(()=>{if(!disposed)setDimensions()});observe.observe($('#composition-scroll',target));ctx.cleanup=()=>{disposed=true;observe.disconnect();clearTimeout(timer)};
   function draw(){updateHead();renderBoard();renderInspector();setDimensions()}
   draw();
