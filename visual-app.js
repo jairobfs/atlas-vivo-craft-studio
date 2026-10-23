@@ -120,4 +120,4 @@ async function openDoc(documentId){if(!documentId)return;try{const d=await API('
 $('#theme').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('atlas-theme',document.body.classList.contains('light')?'light':'dark')};
 if(S.theme==='light')document.body.classList.add('light');
 $('#logout').onclick=async()=>{if(!S.demo){try{await API('logout')}catch{}}S.demo=false;S.auth=false;S.doc=null;S.project=null;S.docs=[];navigate('home')};
-updateNav();(async()=>{try{const st=await API('status');S.auth=!!st.authenticated;if(S.auth)await sync();render()}catch{render()}})();
+updateNav();(async()=>{if(new URLSearchParams(location.search).get('demo')==='1'){S.auth=true;S.demo=true;S.docs=[];S.doc=demo();S.docId='';S.project=compile(S.doc);S.mode='atlas';navigate('atlas');return}try{const st=await API('status');S.auth=!!st.authenticated;if(S.auth)await sync();render()}catch{render()}})();
