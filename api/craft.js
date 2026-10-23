@@ -96,6 +96,25 @@ export default async function handler(req, res) {
         body: JSON.stringify({ documents: [{ title }], destination: { destination: 'unsorted' } }),
       }));
     }
+    if (op === 'update' && req.method === 'POST') {
+      const b = await input(req);
+      const id = b.blockId || b.id;
+      if (!validId(id)) return json(res, 400, { error: 'ID de bloco inválido' });
+      const markdown = limited(b.markdown, 30000);
+      if (!markdown.trim()) return json(res, 400, { error: 'O bloco não pode ficar vazio' });
+      if (typeof b.originalMarkdown !== 'string') return json(res, 400, { error: 'Leia a versão do bloco antes de alterá-la' });
+      // Optimistic concurrency: refuse to overwrite a Craft change made after opening the editor.
+      const latest = await craft('/blocks?id=' + encodeURIComponent(id) + '&maxDepth=0');
+      const candidate = Array.isArray(latest?.data) ? latest.data[0] : Array.isArray(latest?.items) ? latest.items[0] : latest?.data || latest;
+      if (candidate && typeof candidate.markdown === 'string' && candidate.markdown !== b.originalMarkdown) {
+        return json(res, 409, { error: 'Este bloco foi modificado no Craft. Atualize o atlas antes de salvar.' });
+      }
+      return json(res, 200, await craft('/blocks', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blocks: [{ id, markdown }] }),
+      }));
+    }
     if (op === 'append' && req.method === 'POST') {
       const b = await input(req);
       const id = b.documentId || b.id;
@@ -107,6 +126,143 @@ export default async function handler(req, res) {
       return json(res, 200, await craft('/blocks', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ markdown, position: { pageId: id, position: 'end' } }),
+      }));
+    }
+    if (op === 'visual' && req.method === 'POST') {
+      const b = await input(req);
+      if (!validId(b.documentId) || !Array.isArray(b.blocks) || b.blocks.length === 0 || b.blocks.length > 12) {
+        return json(res, 400, { error: 'Componentes inválidos' });
+      }
+      // Inserts native headings and text. Craft remains the sole source of truth.
+      const markdown = b.blocks.map(x => limited(x.markdown, 2500).trim()).filter(Boolean).join('\n\n');
+      if (!markdown.trim()) return json(res, 400, { error: 'Blocos vazios' });
+      return json(res, 200, await craft('/blocks', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markdown, position: { pageId: b.documentId, position: 'end' } }),
+      }));
+    }
+
+    if (op === 'layout' || op === 'layout-save') {
+      const rootId = process.env.ATLAS_LAYOUT_ROOT_ID;
+      const payload = op === 'layout-save' ? await input(req) : null;
+      const targetId = op === 'layout' ? u.searchParams.get('documentId') : payload?.documentId;
+      if (!validId(rootId) || !validId(targetId)) {
+        return json(res, 503, { error: 'Configuração editorial do Craft não está ativa' });
+      }
+      const rootData = await craft('/blocks?id=' + encodeURIComponent(rootId) + '&maxDepth=1');
+      const page = Array.isArray(rootData.data) ? rootData.data[0] : Array.isArray(rootData.items) ? rootData.items[0] : (rootData.data || rootData);
+      const entries = Array.isArray(page?.content) ? page.content : [];
+      const prefix = 'ATLAS-VIVO-LAYOUT ' + targetId + ' ';
+      const existing = entries.find(block => String(block.markdown || '').startsWith(prefix));
+      const parseSaved = () => {
+        if (!existing) return null;
+        try {
+          const stored = JSON.parse(String(existing.markdown).slice(prefix.length));
+          return stored && typeof stored === 'object' ? stored : null;
+        } catch { return null; }
+      };
+      if (op === 'layout') {
+        if (req.method !== 'GET') return json(res, 405, { error: 'Método inválido' });
+        return json(res, 200, { documentId: targetId, config: parseSaved(), source: 'craft' });
+      }
+      if (req.method !== 'POST') return json(res, 405, { error: 'Método inválido' });
+      const currentLayout = parseSaved();
+      if (currentLayout && payload.previousUpdatedAt !== currentLayout.updatedAt) {
+        return json(res, 409, { error: 'Outra edição da composição foi salva no Craft. Reabra o atlas antes de gravar.' });
+      }
+      const cfg = payload.config;
+      if (!cfg || typeof cfg !== 'object' || !Array.isArray(cfg.order) || cfg.order.length > 150) {
+        return json(res, 400, { error: 'Composição visual inválida' });
+      }
+      const validLayouts = new Set(['editorial','panorama','mosaic','spotlight','story']);
+      const sanitizeCanvas = (spatial) => {
+        if (!spatial || !Array.isArray(spatial.boards)) return null;
+        const skins = new Set(['dark','light','paper']);
+        const styles = new Set(['standard','hero','warning','picture','transparent']);
+        const boards = spatial.boards.slice(0,18).filter(b => b && typeof b === 'object').map((b,i) => ({
+          id: limited(b.id || 'board-' + i,130),
+          title: limited(b.title || 'Prancha',120),
+          nodes: (Array.isArray(b.nodes) ? b.nodes : []).slice(0,24).filter(n => n && validId(n.source)).map((n,j) => {
+            const whole=(v,min,max,fallback)=>Math.max(min,Math.min(max,Number.isFinite(Number(v))?Math.round(Number(v)):fallback));
+            const w=whole(n.w,110,1060,300),h=whole(n.h,95,710,160);
+            return {
+              id:limited(n.id || 'node-'+j,110),source:String(n.source),
+              x:whole(n.x,0,1100-w,0),y:whole(n.y,0,619-h,0),w,h,
+              design:styles.has(n.design)?n.design:'standard'
+            };
+          })
+        })).filter(b=>b.id);
+        return {version:1,skin:skins.has(spatial.skin)?spatial.skin:'dark',boards};
+      };
+      const canvas = cfg.canvas === undefined ? currentLayout?.canvas : sanitizeCanvas(cfg.canvas);
+      const normalized = {
+        version: 1,
+        layout: validLayouts.has(cfg.layout) ? cfg.layout : 'editorial',
+        density: ['compact','balanced','expanded'].includes(cfg.density) ? cfg.density : 'balanced',
+        order: cfg.order.filter(x => x && typeof x === 'object').map((x,i) => ({
+          source: limited(x.source || x.key, 120),
+          title: limited(x.title, 180),
+          display: ['full','half','feature','hidden'].includes(x.display) ? x.display : 'full',
+          order: i
+        })).filter(x => x.source),
+        canvas: canvas || null,
+        updatedAt: new Date().toISOString()
+      };
+      const markdown = prefix + JSON.stringify(normalized);
+      if (markdown.length > 30000) return json(res, 413, { error: 'Composição grande demais para um bloco do Craft. Divida em menos pranchas.' });
+      let result;
+      if (existing?.id) {
+        result = await craft('/blocks', {
+          method: 'PUT',headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({blocks:[{id:existing.id,markdown}]})
+        });
+      } else {
+        result = await craft('/blocks', {
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({markdown,position:{pageId:rootId,position:'end'}})
+        });
+      }
+      return json(res, 200, { ok:true,documentId:targetId,config:normalized,storedIn:'Craft',changedBlocks:Boolean(result) });
+    }
+    if (op === 'composition' && req.method === 'POST') {
+      const b = await input(req);
+      const documentId = b.documentId;
+      const markdown = String(b.markdown || '');
+      const PREFIX = 'ATLAS_VIVO_LAYOUT_V1:';
+      if (!validId(documentId) || !markdown.startsWith(PREFIX) || markdown.length > 95000) {
+        return json(res, 400, { error: 'Documento ou composição inválidos' });
+      }
+      let decoded;
+      try {
+        decoded = JSON.parse(decodeURIComponent(markdown.slice(PREFIX.length)));
+      } catch {
+        return json(res, 400, { error: 'Composição JSON inválida' });
+      }
+      if (decoded?.v !== 1 || !Array.isArray(decoded.boards) || decoded.boards.length < 1 || decoded.boards.length > 30) {
+        return json(res, 400, { error: 'Estrutura de pranchas inválida' });
+      }
+      const nodes = decoded.boards.reduce((n, board) => n + (Array.isArray(board.nodes) ? board.nodes.length : 0), 0);
+      if (nodes > 420 || decoded.boards.some(x => !Array.isArray(x.nodes) || x.nodes.length > 14)) {
+        return json(res, 400, { error: 'Quantidade máxima de peças excedida' });
+      }
+      if (b.blockId) {
+        if (!validId(b.blockId) || typeof b.originalMarkdown !== 'string' || !b.originalMarkdown.startsWith(PREFIX)) {
+          return json(res, 400, { error: 'Metadados de atualização inválidos' });
+        }
+        const latest = await craft('/blocks?id=' + encodeURIComponent(b.blockId) + '&maxDepth=0');
+        const candidate = Array.isArray(latest?.data) ? latest.data[0] : Array.isArray(latest?.items) ? latest.items[0] : latest?.data || latest;
+        if (candidate?.markdown !== b.originalMarkdown) {
+          return json(res, 409, { error: 'A composição foi alterada no Craft. Atualize o documento antes de substituir.' });
+        }
+        return json(res, 200, await craft('/blocks', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ blocks: [{ id: b.blockId, markdown }] }),
+        }));
+      }
+      // Create a single visible metadata block at the end. The Craft note remains the source of truth.
+      return json(res, 200, await craft('/blocks', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markdown, position: { pageId: documentId, position: 'end' } }),
       }));
     }
     if (op === 'upload' && req.method === 'POST') {
