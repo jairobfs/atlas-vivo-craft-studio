@@ -94,20 +94,20 @@ export function mountComposer(ctx){
   saving=true;const version=dirty;state('Salvando composição no Craft…');
   const markdown=str(layout);
   try{
-   if(layoutBlock?.id){
-    await ctx.api('update',{}, {id:layoutBlock.id,markdown,originalMarkdown:originalLayoutMarkdown});
-    originalLayoutMarkdown=markdown;
-   }else{
-    const out=await ctx.api('visual',{}, {documentId:ctx.documentId,blocks:[{markdown}]});
-    const item=out?.items?.[0]||out?.data?.[0]||out?.data?.items?.[0];
-    if(item?.id){layoutBlock={id:item.id};originalLayoutMarkdown=markdown}
-    else{
-     const fresh=await ctx.api('document',{id:ctx.documentId});
-     const found=metadataOf(fresh);
-     if(!found?.id)throw Error('Layout inserido, mas ainda não foi possível recuperar seu identificador. Reabra a nota antes de salvar novamente.');
-     layoutBlock={id:found.id};originalLayoutMarkdown=raw(found);
-    }
-   }
+   const out=await ctx.api('layout',{}, {
+     documentId:ctx.documentId,blockId:layoutBlock?.id||null,
+     originalMarkdown:originalLayoutMarkdown,markdown
+   });
+   if(!layoutBlock?.id){
+     const item=out?.items?.[0]||out?.data?.[0]||out?.data?.items?.[0]||out?.items?.items?.[0];
+     if(item?.id){layoutBlock={id:item.id};originalLayoutMarkdown=markdown}
+     else{
+       const fresh=await ctx.api('document',{id:ctx.documentId});
+       const found=metadataOf(fresh);
+       if(!found?.id)throw Error('Composição criada, mas o Craft não retornou o ID. Reabra a nota antes de salvar novamente.');
+       layoutBlock={id:found.id};originalLayoutMarkdown=raw(found);
+     }
+   }else{originalLayoutMarkdown=markdown}
    saved=version;state(saved>=dirty?'Composição salva no Craft':'Sincronizando alterações recentes',saved>=dirty?'ok':'pending');
   }catch(e){state('Falha ao salvar: '+e.message,'error')}finally{saving=false;if(saved<dirty&&saved>0&&!disposed)timer=setTimeout(save,1000)}
  }
