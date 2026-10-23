@@ -94,7 +94,7 @@ function showComposer(){
   save:async(config)=>{
     if(S.demo)return{config};
     if(!S.docId)throw Error('Nenhum documento do Craft selecionado');
-    return await API('layout-save',{}, {documentId:S.docId,config});
+    return await API('layout-save',{}, {documentId:S.docId,config,previousUpdatedAt:S.layoutConfig?.updatedAt||null});
   },
   onStored:(config)=>{S.layoutConfig=config;inform(S.demo?'Prévia visual ajustada':'Composição armazenada no Craft')},
   onClose:()=>{S.composer=null;atlas()},
