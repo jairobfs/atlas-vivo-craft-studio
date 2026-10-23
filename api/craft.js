@@ -202,6 +202,47 @@ export default async function handler(req, res) {
       }
       return json(res, 200, { ok:true,documentId:targetId,config:normalized,storedIn:'Craft',changedBlocks:Boolean(result) });
     }
+    if (op === 'layout' && req.method === 'POST') {
+      const b = await input(req);
+      const documentId = b.documentId;
+      const markdown = String(b.markdown || '');
+      const PREFIX = 'ATLAS_VIVO_LAYOUT_V1:';
+      if (!validId(documentId) || !markdown.startsWith(PREFIX) || markdown.length > 95000) {
+        return json(res, 400, { error: 'Documento ou composição inválidos' });
+      }
+      let decoded;
+      try {
+        decoded = JSON.parse(decodeURIComponent(markdown.slice(PREFIX.length)));
+      } catch {
+        return json(res, 400, { error: 'Composição JSON inválida' });
+      }
+      if (decoded?.v !== 1 || !Array.isArray(decoded.boards) || decoded.boards.length < 1 || decoded.boards.length > 30) {
+        return json(res, 400, { error: 'Estrutura de pranchas inválida' });
+      }
+      const nodes = decoded.boards.reduce((n, board) => n + (Array.isArray(board.nodes) ? board.nodes.length : 0), 0);
+      if (nodes > 420 || decoded.boards.some(x => !Array.isArray(x.nodes) || x.nodes.length > 14)) {
+        return json(res, 400, { error: 'Quantidade máxima de peças excedida' });
+      }
+      if (b.blockId) {
+        if (!validId(b.blockId) || typeof b.originalMarkdown !== 'string' || !b.originalMarkdown.startsWith(PREFIX)) {
+          return json(res, 400, { error: 'Metadados de atualização inválidos' });
+        }
+        const latest = await craft('/blocks?id=' + encodeURIComponent(b.blockId) + '&maxDepth=0');
+        const candidate = Array.isArray(latest?.data) ? latest.data[0] : Array.isArray(latest?.items) ? latest.items[0] : latest?.data || latest;
+        if (candidate?.markdown !== b.originalMarkdown) {
+          return json(res, 409, { error: 'A composição foi alterada no Craft. Atualize o documento antes de substituir.' });
+        }
+        return json(res, 200, await craft('/blocks', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ blocks: [{ id: b.blockId, markdown }] }),
+        }));
+      }
+      // Create a single visible metadata block at the end. The Craft note remains the source of truth.
+      return json(res, 200, await craft('/blocks', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markdown, position: { pageId: documentId, position: 'end' } }),
+      }));
+    }
     if (op === 'upload' && req.method === 'POST') {
       const id = u.searchParams.get('id');
       const position = u.searchParams.get('position') || 'end';
