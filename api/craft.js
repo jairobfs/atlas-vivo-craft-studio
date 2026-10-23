@@ -144,7 +144,8 @@ export default async function handler(req, res) {
 
     if (op === 'layout' || op === 'layout-save') {
       const rootId = process.env.ATLAS_LAYOUT_ROOT_ID;
-      const targetId = op === 'layout' ? u.searchParams.get('documentId') : (await input(req)).documentId;
+      const payload = op === 'layout-save' ? await input(req) : null;
+      const targetId = op === 'layout' ? u.searchParams.get('documentId') : payload?.documentId;
       if (!validId(rootId) || !validId(targetId)) {
         return json(res, 503, { error: 'Configuração editorial do Craft não está ativa' });
       }
@@ -165,8 +166,6 @@ export default async function handler(req, res) {
         return json(res, 200, { documentId: targetId, config: parseSaved(), source: 'craft' });
       }
       if (req.method !== 'POST') return json(res, 405, { error: 'Método inválido' });
-      // Re-read the JSON body through req.body; if streamed it is cached by Vercel.
-      const payload = typeof req.body === 'object' ? req.body : await input(req);
       const cfg = payload.config;
       if (!cfg || typeof cfg !== 'object' || !Array.isArray(cfg.order) || cfg.order.length > 150) {
         return json(res, 400, { error: 'Composição visual inválida' });
