@@ -1,7 +1,6 @@
 import {esc,safe,list,flat,title,id,raw,rich,image,level,kind,compile,clean,steps,sides,rows,demo} from './visual-core.js';
 import {openVisualComposer,orderedVisualSections} from './visual-composer.js';
 import {openSpatialComposer} from './spatial-composer.js';
-import {mountComposer} from './composer.js';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'atlas',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false,layoutConfig:null,composer:null,spatial:null};
 const menu=[['home','Painel'],['library','Biblioteca'],['atlas','Atlas visual'],['studio','Estúdio']];
@@ -85,25 +84,12 @@ function atlas(){
  $('#atlas-mode').onclick=()=>{S.mode='atlas';atlas()};$('#map-mode').onclick=()=>{S.mode='map';atlas()};$('#presentation-mode').onclick=()=>{S.mode='presentation';S.presentationIndex=0;atlas()};
  $('#composer-open').onclick=showComposer;
  $('#spatial-open').onclick=showSpatialComposer;
- $('#canvas-open').onclick=showSpatialComposer;
+ const legacyCanvas=$('#canvas-open');if(legacyCanvas)legacyCanvas.onclick=showSpatialComposer;
  const audit=$('#audit-figures');if(audit)audit.onclick=showFigureAudit;
  $('#visual-edit').onclick=()=>{S.editorMode='edit';navigate('studio')};$('#print').onclick=()=>window.print();
  $$('[data-zoom]').forEach(img=>img.onclick=()=>zoom(img.dataset.zoom,img.alt));
  $$('[data-map-jump]').forEach(b=>b.onclick=e=>{e.preventDefault();S.mode='atlas';atlas();document.getElementById(b.dataset.mapJump)?.scrollIntoView({behavior:'smooth'})});
  const prev=$('#previous-slide'),next=$('#next-slide');if(prev)prev.onclick=()=>{S.presentationIndex=Math.max(0,S.presentationIndex-1);atlas()};if(next)next.onclick=()=>{S.presentationIndex=Math.min(S.project.sections.length-1,S.presentationIndex+1);atlas()};
-}
-function showSpatialComposer(){
- if(!S.doc||!S.project){inform('Abra um atlas antes de compor');return}
- const existing=document.getElementById('atlas-spatial-composer');
- if(existing)return;
- const sheet=document.createElement('section');
- sheet.id='atlas-spatial-composer';sheet.className='composer-fullscreen';
- sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');
- sheet.setAttribute('aria-label','Composição visual livre do Atlas Vivo');
- document.body.append(sheet);
- let handle;
- const close=()=>{handle?.cleanup?.();sheet.remove();};
- handle=mountComposer({target:sheet,doc:S.doc,documentId:S.docId,demo:S.demo,api:API,onBack:close});
 }
 function showFigureAudit(){
  const missing=S.project?.missingFigures||[];
