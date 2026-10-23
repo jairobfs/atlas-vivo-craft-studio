@@ -109,7 +109,7 @@ export default async function handler(req, res) {
       craftUrl: 'https://docs.craft.do/editor/d/c3b34bfd-9b77-6809-f4d0-a206276df43a/3dac343a-bb21-81b7-db40-70de6fd8a51f'
     });
     if (op === 'catalog' && req.method === 'GET') return json(res, 200, await craft('/documents?fetchMetadata=true'));
-    const mutatingOps = new Set(['create','update','append','visual','layout-save','composition-save','upload']);
+    const mutatingOps = new Set(['create','update','append','visual','layout-save','composition','upload']);
     if (control && control.editingEnabled === false && mutatingOps.has(op)) {
       return json(res, 403, { error: 'Edição desativada na Central de Controle do Craft' });
     }
@@ -231,7 +231,7 @@ export default async function handler(req, res) {
           title: limited(b.title || 'Prancha',120),
           nodes: (Array.isArray(b.nodes) ? b.nodes : []).slice(0,24).filter(n => n && validId(n.source)).map((n,j) => {
             const whole=(v,min,max,fallback)=>Math.max(min,Math.min(max,Number.isFinite(Number(v))?Math.round(Number(v)):fallback));
-            const w=whole(n.w,110,1060,300),h=whole(n.h,95,710,160);
+            const w=whole(n.w,110,1060,300),h=whole(n.h,95,619,160);
             return {
               id:limited(n.id || 'node-'+j,110),source:String(n.source),
               x:whole(n.x,0,1100-w,0),y:whole(n.y,0,619-h,0),w,h,
