@@ -22,5 +22,5 @@ test('Craft visual editing refuses to modify public demo',()=>{
 });
 
 test('Refresh on return skips unsaved studio work and public demo',()=>{
- assert.match(src,/S\.demo\|\|S\.tab!=='atlas'/);
+ assert.match(src,/S\.demo\|\|S\.settings\?\.autoRefresh===false\|\|S\.tab!=='atlas'/);
 });
