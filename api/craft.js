@@ -224,7 +224,7 @@ export default async function handler(req, res) {
       }
       return json(res, 200, { ok:true,documentId:targetId,config:normalized,storedIn:'Craft',changedBlocks:Boolean(result) });
     }
-    if (op === 'layout' && req.method === 'POST') {
+    if (op === 'composition' && req.method === 'POST') {
       const b = await input(req);
       const documentId = b.documentId;
       const markdown = String(b.markdown || '');
