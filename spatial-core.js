@@ -41,7 +41,7 @@ export function normalizeCanvas(project,value){
    const nodes=[];
    for(const item of (Array.isArray(p.nodes)?p.nodes:[]).slice(0,40)){
       if(!item||!available.has(String(item.source)))continue;
-      const w=within(item.w,110,1060),h=within(item.h,95,710);
+      const w=within(item.w,110,1060),h=within(item.h,95,BOARD_H);
       nodes.push({id:String(item.id||('n'+nodes.length)).slice(0,110),source:String(item.source),x:within(item.x,0,BOARD_W-w),y:within(item.y,0,BOARD_H-h),w,h,design:allowed.has(item.design)?item.design:'standard'});
    }
    boards.push({id:boardId,title:String(p.title||'Prancha').slice(0,120),nodes});
@@ -50,7 +50,7 @@ export function normalizeCanvas(project,value){
  return {version:1,skin:['dark','light','paper'].includes(value.skin)?value.skin:'dark',boards};
 }
 export function updateNode(node,changes){
- const w=within(changes.w??node.w,110,1060),h=within(changes.h??node.h,95,710);
+ const w=within(changes.w??node.w,110,1060),h=within(changes.h??node.h,95,BOARD_H);
  return {...node,w,h,x:within(changes.x??node.x,0,BOARD_W-w),y:within(changes.y??node.y,0,BOARD_H-h),design:changes.design||node.design};
 }
 export function addNode(board,source){
