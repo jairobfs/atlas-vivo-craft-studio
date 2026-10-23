@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { parseControlDocument, safeControl, filterLibrary } from './atlas-control.js';
+import { planAdminUpdate, publicCatalog, safeOrigin } from './atlas-admin.js';
 
 // The Craft connection is stored as an encrypted server-side Vercel environment variable.
 // Do not place the private connection URL in browser-side scripts.
@@ -108,7 +109,44 @@ export default async function handler(req, res) {
       ...safeControl(control), controlError,
       craftUrl: 'https://docs.craft.do/editor/d/c3b34bfd-9b77-6809-f4d0-a206276df43a/3dac343a-bb21-81b7-db40-70de6fd8a51f'
     });
-    if (op === 'catalog' && req.method === 'GET') return json(res, 200, await craft('/documents?fetchMetadata=true'));
+    if (op === 'catalog' && req.method === 'GET') {
+      const docs = await craft('/documents?fetchMetadata=true');
+      return json(res, 200, { items: publicCatalog(docs,process.env.ATLAS_CONTROL_ROOT_ID) });
+    }
+    if (op === 'control-save' && req.method === 'POST') {
+      // Owner-only: the existing HttpOnly login cookie is mandatory for every write.
+      if (!safeOrigin(req)) return json(res, 403, { error: 'Origem inválida' });
+      if (!validId(process.env.ATLAS_CONTROL_ROOT_ID)) return json(res, 503, { error: 'Central Craft não configurada' });
+      const body = await input(req);
+      const source = await craft('/blocks?id=' + encodeURIComponent(process.env.ATLAS_CONTROL_ROOT_ID) + '&maxDepth=1');
+      const catalog = Object.hasOwn(body,'selectedIds') ? await craft('/documents?fetchMetadata=true') : null;
+      const plan = planAdminUpdate(source,body,catalog,process.env.ATLAS_CONTROL_ROOT_ID);
+      if (plan.unchanged) return json(res, 200, { ok: true, unchanged: true, settings: safeControl(plan.previous) });
+      const h = { 'Content-Type':'application/json' };
+      if (plan.updates.length) {
+        await craft('/blocks',{method:'PUT',headers:h,body:JSON.stringify({blocks:plan.updates})});
+      }
+      if (plan.library?.add?.length) {
+        await craft('/blocks',{
+          method:'POST',headers:h,
+          body:JSON.stringify({markdown:plan.library.add.join('\n\n'),position:{siblingId:plan.library.anchor,position:'after'}})
+        });
+      }
+      if (plan.library?.remove?.length) {
+        await craft('/blocks',{method:'DELETE',headers:h,body:JSON.stringify({blockIds:plan.library.remove})});
+      }
+      // Confirm persisted values directly from Craft. Never return the access code.
+      cachedCraftControl = null; controlCacheUntil = 0;
+      const persisted = await readCraftControl();
+      const codeChanged = plan.updates.some(x=>x.markdown.startsWith('Código de acesso:'));
+      if (codeChanged) {
+        const secure = process.env.VERCEL || req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : '';
+        const maxAge = Math.min(90,Math.max(1,persisted.sessionDays||30))*86400;
+        // Keep the owner's current browser logged in, while revoking previously issued cookies.
+        res.setHeader('Set-Cookie','av_session='+sessionToken(persisted)+'; HttpOnly; SameSite=Strict; Path=/; Max-Age='+maxAge+secure);
+      }
+      return json(res, 200, { ok:true,storedIn:'Craft',settings:safeControl(persisted),accessRotated:codeChanged });
+    }
     const mutatingOps = new Set(['create','update','append','visual','layout-save','composition','upload']);
     if (control && control.editingEnabled === false && mutatingOps.has(op)) {
       return json(res, 403, { error: 'Edição desativada na Central de Controle do Craft' });
