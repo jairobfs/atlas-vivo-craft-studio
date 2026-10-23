@@ -79,17 +79,17 @@ function atlas(){
  if(!S.project){$('#screen').innerHTML='<div class="empty">Selecione um documento para construir o atlas.</div>';return}
  const v={...S.project,sections:orderedVisualSections(S.project,S.layoutConfig)},demoFlag=S.demo;
  const u=craftURL();
- $('#screen').innerHTML='<div class="article"><div class="article-head"><div class="eyebrow">ATLAS VISUAL · COLORHUB × UNIVERSO</div><h1>'+esc(v.title)+'</h1><p class="outline-label">'+(demoFlag?'Exemplo autoral de apresentação. Abra uma nota para renderizar conteúdo verdadeiro.':'Composição editorial estruturada a partir dos blocos originais do Craft.')+'</p><div class="bar"><div class="pillset"><span class="chip">'+v.sections.length+' pranchas</span><span class="chip">'+v.figures+' imagens</span><span class="chip">'+v.tables+' tabelas</span>'+(v.missingFigures?.length?'<button class="btn small audit-figure" id="audit-figures">'+v.missingFigures.length+' figuras pendentes</button>':'')+'</div><div class="actions"><button class="btn small" id="refresh">Atualizar</button>'+(!demoFlag&&u?'<a class="btn small primary" href="'+esc(u)+'">Editar no Craft ↗</a>':'')+'</div></div><div class="actions" style="margin-top:13px"><button class="btn small '+(S.mode==='immersive'?'active':'')+'" id="immersive-mode">Experiência visual</button><button class="btn small '+(S.mode==='atlas'?'active':'')+'" id="atlas-mode">Leitura clássica</button><button class="btn small '+(S.mode==='map'?'active':'')+'" id="map-mode">Mapa mental</button><button class="btn small '+(S.mode==='presentation'?'active':'')+'" id="presentation-mode">Apresentar 16:9</button><button class="btn small '+(S.mode==='composed'?'active':'')+'" id="composed-mode">Lousas compostas</button><button class="btn small" id="composer-open">Layouts rápidos</button><button class="btn small primary" id="canvas-open">Canvas livre · arrastar peças</button><button class="btn small" id="visual-edit">Editar textos</button><button class="btn small" id="print">Exportar PDF</button></div></div>'+
+ $('#screen').innerHTML='<div class="article"><div class="article-head"><div class="eyebrow">ATLAS VISUAL · COLORHUB × UNIVERSO</div><h1>'+esc(v.title)+'</h1><p class="outline-label">'+(demoFlag?'Exemplo autoral de apresentação. Abra uma nota para renderizar conteúdo verdadeiro.':'Composição editorial estruturada a partir dos blocos originais do Craft.')+'</p><div class="bar"><div class="pillset"><span class="chip">'+v.sections.length+' pranchas</span><span class="chip">'+v.figures+' imagens</span><span class="chip">'+v.tables+' tabelas</span>'+(v.missingFigures?.length?'<button class="btn small audit-figure" id="audit-figures">'+v.missingFigures.length+' figuras pendentes</button>':'')+'</div><div class="actions"><button class="btn small" id="refresh">Atualizar</button>'+(!demoFlag&&u?'<a class="btn small primary" href="'+esc(u)+'">Editar no Craft ↗</a>':'')+'</div></div><div class="actions" style="margin-top:13px"><button class="btn small '+(S.mode==='immersive'?'active':'')+'" id="immersive-mode">Experiência visual</button><button class="btn small '+(S.mode==='atlas'?'active':'')+'" id="atlas-mode">Leitura clássica</button><button class="btn small '+(S.mode==='map'?'active':'')+'" id="map-mode">Mapa mental</button><button class="btn small '+(S.mode==='presentation'?'active':'')+'" id="presentation-mode">Apresentar 16:9</button><button class="btn small '+(S.mode==='composed'?'active':'')+'" id="composed-mode">Lousas compostas</button>'+(S.settings?.editingEnabled===false&&!S.demo?'':'<button class="btn small" id="composer-open">Layouts rápidos</button><button class="btn small primary" id="canvas-open">Canvas livre · arrastar peças</button><button class="btn small" id="visual-edit">Editar textos</button>')+'<button class="btn small" id="print">Exportar PDF</button></div></div>'+
  (S.mode==='immersive'?renderImmersiveAtlas(v):S.mode==='map'?renderMap(v):S.mode==='presentation'?renderPresentation(v):S.mode==='composed'?renderSpatialDocument(S.project,S.layoutConfig):'<div class="article-toc">'+v.sections.map(s=>'<a href="#'+esc(s.key)+'">'+esc(s.name)+'</a>').join('')+'</div><div class="atlas-stack layout-'+esc(S.layoutConfig?.layout||'editorial')+' density-'+esc(S.layoutConfig?.density||'balanced')+'">'+v.sections.map(groupRender).join('')+'</div>')+
  '<div class="footer-note">Origem: Craft. Figuras originais preservadas. Este renderizador não substitui revisão científica das fontes.</div></div>';
  $('#refresh').onclick=()=>{if(S.demo){S.project=compile(demo());atlas()}else openDoc(S.docId)};
  $('#immersive-mode').onclick=()=>{S.mode='immersive';atlas()};
  $('#atlas-mode').onclick=()=>{S.mode='atlas';atlas()};$('#map-mode').onclick=()=>{S.mode='map';atlas()};$('#presentation-mode').onclick=()=>{S.mode='presentation';S.presentationIndex=0;atlas()};
  $('#composed-mode').onclick=()=>{S.mode='composed';atlas()};
- $('#composer-open').onclick=showComposer;
- $('#canvas-open').onclick=showSpatialComposer;
+ const composeButton=$('#composer-open');if(composeButton)composeButton.onclick=showComposer;
+ const canvasButton=$('#canvas-open');if(canvasButton)canvasButton.onclick=showSpatialComposer;
  const audit=$('#audit-figures');if(audit)audit.onclick=showFigureAudit;
- $('#visual-edit').onclick=()=>{S.editorMode='edit';navigate('studio')};$('#print').onclick=()=>window.print();
+ const editButton=$('#visual-edit');if(editButton)editButton.onclick=()=>{S.editorMode='edit';navigate('studio')};$('#print').onclick=()=>window.print();
  $$('[data-zoom]').forEach(img=>img.onclick=()=>zoom(img.dataset.zoom,img.alt));
  if(S.mode==='composed')requestAnimationFrame(scaleSpatialPreviews);
  if(S.mode==='immersive')bindImmersiveAtlas($('#screen'));
@@ -154,6 +154,7 @@ function renderMap(data){
 
 function zoom(url,caption){let host=document.createElement('div');host.className='lightbox';host.innerHTML='<button aria-label="Fechar imagem">Fechar ×</button><img src="'+esc(url)+'" alt="'+esc(caption)+'"><figcaption>'+esc(caption)+'</figcaption>';document.body.append(host);host.onclick=()=>host.remove();document.addEventListener('keydown',function once(e){if(e.key==='Escape'){host.remove();document.removeEventListener('keydown',once)}})}
 function studio(){
+ if(S.settings?.editingEnabled===false&&!S.demo){$('#screen').innerHTML='<div class="hero"><div class="eyebrow">CONTROLE CRAFT</div><h1>Edição desativada nesta biblioteca.</h1><p>Abra a Central de Controle e altere o campo Permitir edição no ATLAS para sim.</p><button class="btn primary" id="go-control">Abrir Controle Craft</button></div>';$('#go-control').onclick=()=>navigate('control');return}
  if(S.demo){$('#screen').innerHTML='<div class="hero"><div class="eyebrow">EDITORIAL</div><h1>Abra um documento real do Craft.</h1><p>Na demonstração, a edição está bloqueada para não criar dados fictícios. Use sua biblioteca real para editar texto e criar pranchas.</p><button class="btn primary" id="choose">Abrir biblioteca</button></div>';$('#choose').onclick=()=>navigate('library');return}
  if(!S.project){$('#screen').innerHTML='<div class="hero"><div class="eyebrow">ESTÚDIO</div><h1>Edição visual, sem código.</h1><p>Abra um atlas real para editar suas seções e componentes.</p><button class="btn primary" id="choose">Escolher nota Craft</button></div>';$('#choose').onclick=()=>navigate('library');return}
  const blocks=S.project.body.filter(b=>b.type==='text'||b.type==='code');
@@ -198,6 +199,8 @@ function render(){$('#logout').classList.toggle('hide',!S.auth);if(!S.auth)retur
 function applyControlOptions(){
  const conf=S.settings;if(!conf)return;
  document.body.classList.toggle('light',conf.theme==='light');
+ document.body.classList.remove('atlas-density-compact','atlas-density-balanced','atlas-density-spacious');
+ document.body.classList.add('atlas-density-'+(conf.density||'balanced'));
  const tagline=document.querySelector('.tagline');if(tagline)tagline.textContent=conf.subtitle||'ColorHub × Craft Studio';
  document.title=(conf.appTitle||'ATLAS VIVO')+' · Craft Studio';
 }
@@ -222,7 +225,7 @@ $('#logout').onclick=async()=>{if(!S.demo){try{await API('logout')}catch{}}S.dem
 
 let lastAutoRefresh=0;
 function refreshOnReturn(){
- if(!S.auth||S.demo||S.tab!=='atlas'||!S.docId)return;
+ if(!S.auth||S.demo||S.settings?.autoRefresh===false||S.tab!=='atlas'||!S.docId)return;
  const now=Date.now();
  if(now-lastAutoRefresh<15000)return;
  lastAutoRefresh=now;
