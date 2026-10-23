@@ -27,6 +27,7 @@ jobs:
           node --check visual-app.js
           node --check spatial-core.js
           node --check spatial-composer.js
+          node --check immersive-atlas.js
           node --check composer.js
           node --check api/craft.js
       - name: Validate Craft atlas parser, navigation, and safety
