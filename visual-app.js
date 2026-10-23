@@ -2,9 +2,10 @@ import {esc,safe,list,flat,title,id,raw,rich,image,level,kind,compile,clean,step
 import {openVisualComposer,orderedVisualSections} from './visual-composer.js';
 import {openSpatialComposer,renderSpatialDocument,scaleSpatialPreviews} from './spatial-composer.js';
 import {renderImmersiveAtlas,bindImmersiveAtlas} from './immersive-atlas.js';
+import {renderAdminConsole} from './admin-panel.js';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'immersive',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false,layoutConfig:null,composer:null,spatial:null,settings:null};
-const menu=[['home','Painel'],['library','Biblioteca'],['atlas','Atlas visual'],['studio','Estúdio'],['control','Controle Craft']];
+const menu=[['home','Painel'],['library','Biblioteca'],['atlas','Atlas visual'],['studio','Estúdio'],['control','Meu ATLAS']];
 async function API(op,args={},data){
  const u=new URL('/api/craft',location.href);u.searchParams.set('op',op);
  for(const [k,v] of Object.entries(args))u.searchParams.set(k,v);
@@ -13,7 +14,7 @@ async function API(op,args={},data){
 }
 function inform(v){const el=$('#toast');el.textContent=String(v);el.classList.remove('hide');clearTimeout(inform.t);inform.t=setTimeout(()=>el.classList.add('hide'),3800)}
 function navigate(p){S.tab=p;if(p==='atlas'&&!S.project&&S.auth){S.doc=demo();S.project=compile(S.doc);S.demo=true};updateNav();render();window.scrollTo(0,0)}
-function updateNav(){for(const el of $$('.nav-target'))el.innerHTML=menu.map(([p,l])=>'<button data-nav="'+p+'" class="'+(S.tab===p?'active':'')+'">'+l+'</button>').join('');$$('[data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav));$('#crumb').textContent='ATLAS VIVO / '+({home:'Painel',library:'Biblioteca',atlas:'Atlas Visual',studio:'Estúdio',control:'Controle Craft'}[S.tab]||S.tab)}
+function updateNav(){for(const el of $$('.nav-target'))el.innerHTML=menu.map(([p,l])=>'<button data-nav="'+p+'" class="'+(S.tab===p?'active':'')+'">'+l+'</button>').join('');$$('[data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav));$('#crumb').textContent='ATLAS VIVO / '+({home:'Painel',library:'Biblioteca',atlas:'Atlas Visual',studio:'Estúdio',control:'Meu ATLAS'}[S.tab]||S.tab)}
 function documentCard(d){const key=id(d);return '<button class="tile" data-doc="'+esc(key)+'"><div class="eyebrow">DOCUMENTO NATIVO · CRAFT</div><h3>'+esc(title(d))+'</h3><p>Visualizar em pranchas, editar conteúdo e explorar conceitos</p><div class="footer-note">Abrir atlas →</div></button>'}
 function bindCards(){$$('[data-doc]').forEach(b=>b.onclick=()=>openDoc(b.dataset.doc))}
 function landing(){
@@ -25,7 +26,7 @@ function landing(){
 }
 function library(){
  let docs=S.docs.filter(d=>title(d).toLowerCase().includes(S.filter.toLowerCase()));
- $('#screen').innerHTML='<div class="section-top"><div><div class="eyebrow">CONTEÚDO FONTE · CRAFT</div><h1>Biblioteca viva</h1></div><div class="actions"><button id="manage-library" class="btn small outline">Escolher notas no Craft</button><button id="sync" class="btn">Sincronizar</button></div></div><input class="field" id="search" placeholder="Pesquise por título..." value="'+esc(S.filter)+'"><div class="mini muted" id="result-count">'+docs.length+' documentos · clique para construir a visualização</div><div id="cards" class="grid" style="margin-top:16px">'+docs.map(documentCard).join('')+'</div>';
+ $('#screen').innerHTML='<div class="section-top"><div><div class="eyebrow">CONTEÚDO FONTE · CRAFT</div><h1>Biblioteca viva</h1></div><div class="actions"><button id="manage-library" class="btn small outline">Gerenciar biblioteca</button><button id="sync" class="btn">Sincronizar</button></div></div><input class="field" id="search" placeholder="Pesquise por título..." value="'+esc(S.filter)+'"><div class="mini muted" id="result-count">'+docs.length+' documentos · clique para construir a visualização</div><div id="cards" class="grid" style="margin-top:16px">'+docs.map(documentCard).join('')+'</div>';
  $('#manage-library').onclick=()=>navigate('control');
  $('#sync').onclick=sync;$('#search').oninput=e=>{S.filter=e.target.value;let v=S.docs.filter(d=>title(d).toLowerCase().includes(S.filter.toLowerCase()));$('#cards').innerHTML=v.map(documentCard).join('');$('#result-count').textContent=v.length+' documentos';bindCards()};bindCards();
 }
@@ -177,22 +178,30 @@ function studio(){
  }
 }
 function controlPanel(){
- const c=S.settings||{};
- const url=c.craftUrl||'https://docs.craft.do/editor/d/c3b34bfd-9b77-6809-f4d0-a206276df43a/3dac343a-bb21-81b7-db40-70de6fd8a51f';
- const notes=Array.isArray(c.visibleNotes)?c.visibleNotes:[];
- const noteList=notes.length?notes.map((n,i)=>'<div class="control-row"><span class="eyebrow">'+String(i+1).padStart(2,'0')+'</span><strong>'+esc(n)+'</strong></div>').join(''):'<div class="muted mini">Nenhuma seleção definida. Adicione blocos Exibir: título no Craft.</div>';
- $('#screen').innerHTML='<div class="hero control-hero"><div class="eyebrow">ATLAS VIVO · ADMINISTRAÇÃO CRAFT-FIRST</div><h1>Seu aplicativo. Suas regras. Tudo no Craft.</h1><p>Aqui você visualiza as definições ativas. A edição acontece diretamente numa nota normal do Craft, sem GitHub, backup, API ou programação.</p><div class="actions"><a class="btn primary" target="_blank" rel="noopener" href="'+esc(url)+'">Abrir Central de Controle no Craft ↗</a><button id="control-refresh" class="btn">Recarregar configurações</button></div></div>'+
- '<div class="stats"><div class="panel"><div class="eyebrow">ACESSO</div><h2>Alterável no Craft</h2><p class="muted mini">Edite o campo Código de acesso. A chave não é exibida no painel público do site.</p><span class="chip">'+(c.sessionDays||30)+' dias de sessão</span></div>'+
- '<div class="panel"><div class="eyebrow">BIBLIOTECA</div><h2>'+(c.libraryMode==='selected'?'Somente notas escolhidas':'Todas as notas acessíveis')+'</h2><p class="muted mini">Reorganize as linhas Exibir na nota Craft para mudar a ordem dos documentos.</p><span class="chip">'+S.docs.length+' notas visíveis</span></div></div>'+
- '<div class="panel" style="margin-top:16px"><div class="section-top" style="margin-top:0"><h2>Documentos publicados</h2><span class="chip">'+notes.length+' selecionados</span></div>'+noteList+'</div>'+
- '<div class="panel"><div class="eyebrow">EXPERIÊNCIA VISUAL</div><div class="control-options"><div><span>Entrada</span><strong>'+(c.home==='library'?'Biblioteca':'Painel')+'</strong></div><div><span>Visualização</span><strong>'+esc(c.view||'imersivo')+'</strong></div><div><span>Tema</span><strong>'+esc(c.theme||'dark')+'</strong></div><div><span>Densidade</span><strong>'+esc(c.density||'balanced')+'</strong></div><div><span>Atualizar ao abrir</span><strong>'+(c.autoRefresh?'Sim':'Não')+'</strong></div><div><span>Editar conteúdos</span><strong>'+(c.editingEnabled?'Permitido':'Desativado')+'</strong></div></div></div>'+
- '<div class="notice">Como usar: toque em <strong>Abrir Central de Controle</strong>, altere qualquer valor da nota e volte aqui em <strong>Recarregar configurações</strong>. As próximas leituras da biblioteca usarão sua seleção.</div>';
- $('#control-refresh').onclick=async()=>{await sync();controlPanel();inform('Configurações recuperadas do Craft')};
+ if(S.demo){
+  $('#screen').innerHTML='<div class="hero"><div class="eyebrow">ADMINISTRAÇÃO</div><h1>Entre para gerenciar o seu ATLAS.</h1><p>A demonstração pública não permite alterar as configurações do Craft.</p><button class="btn primary" id="back-demo">Voltar ao atlas</button></div>';
+  $('#back-demo').onclick=()=>navigate('atlas');return;
+ }
+ $('#screen').innerHTML='<div class="panel"><div class="eyebrow">MEU ATLAS</div><h2>Carregando controles do Craft…</h2></div>';
+ renderAdminConsole({
+   host:$('#screen'),api:API,settings:S.settings,
+   onSaved:async settings=>{
+     S.settings=settings;applyControlOptions();
+     try{const d=await API('documents');S.docs=list(d)}catch(e){inform('Ajustes salvos; biblioteca temporariamente indisponível: '+e.message)}
+   },
+   onCreated:async()=>{
+     try{const d=await API('documents');S.docs=list(d)}catch{}
+   },
+   onExit:()=>navigate('library')
+ }).catch(e=>{
+   $('#screen').innerHTML='<div class="panel"><div class="eyebrow">ADMINISTRAÇÃO</div><h2>Não foi possível abrir o painel.</h2><p class="muted">'+esc(e.message)+'</p><button class="btn" id="admin-try">Tentar novamente</button></div>';
+   $('#admin-try').onclick=controlPanel;
+ });
 }
 
 function login(){
  $('#screen').innerHTML='<div class="login"><div class="eyebrow">ATLAS VIVO · ACESSO PRIVADO</div><h1>Estudo visual conectado ao Craft.</h1><p class="muted">Conexão e credenciais permanecem no servidor. A biblioteca só é carregada depois do login.</p><div class="panel"><label for="key">Código de acesso</label><input id="key" type="password" class="field" autocomplete="current-password" placeholder="Digite o código privado"><button class="btn primary" id="enter" style="width:100%">Entrar no Studio</button><button class="btn outline" id="preview" style="width:100%;margin-top:10px">Conhecer atlas visual de demonstração</button><div id="err" class="mini muted"></div></div></div>';
- $('#preview').onclick=()=>{S.demo=true;S.auth=true;S.docs=[];S.doc=demo();S.docId='';S.project=compile(S.doc);S.mode='atlas';navigate('atlas')};
+ $('#preview').onclick=()=>{S.demo=true;S.auth=true;S.docs=[];S.doc=demo();S.docId='';S.project=compile(S.doc);S.mode='immersive';navigate('atlas')};
  $('#enter').onclick=async()=>{let b=$('#enter');b.disabled=true;try{await API('login',{}, {password:$('#key').value});S.auth=true;await sync();navigate(S.settings?.home||'home')}catch(e){$('#err').textContent=e.message}finally{b.disabled=false}};$('#key').onkeydown=e=>{if(e.key==='Enter')$('#enter').click()};
 }
 function render(){$('#logout').classList.toggle('hide',!S.auth);if(!S.auth)return login();if(S.tab==='home')landing();else if(S.tab==='library')library();else if(S.tab==='atlas')atlas();else if(S.tab==='control')controlPanel();else studio()}
