@@ -15,6 +15,22 @@
   const terms=document.getElementById('craft-context-terms');
   const contextDetail=document.getElementById('craft-context-detail');
   if(!root||!status||!refresh||!open)return;
+  // This GitHub branch is intentionally public. Private Craft API endpoints
+  // are disabled server-side; do not display controls that would only fail.
+  const PUBLIC_EDITION = true;
+  if (PUBLIC_EDITION) {
+    const craftUrl='craftdocs://open?spaceId=8b335448-6499-3d04-91c1-5f99c399aca8&blockId=7600209f-ac0e-25cc-79b4-71e9b211b32d';
+    status.textContent='Craft externo · privacidade preservada';
+    title.textContent='Acervo original no Craft';
+    description.textContent='Os capítulos, casos e modelos funcionam neste Atlas. Notas privadas e edição permanecem no aplicativo Craft.';
+    root.innerHTML='<div class="craft-error"><b>Edição pública independente</b><p>Para manter suas notas privadas protegidas, a leitura e a gravação direta no Craft estão desabilitadas neste endereço.</p><p><a href="'+craftUrl+'">Abrir acervo original no Craft ↗</a></p></div>';
+    refresh.hidden=true;refresh.disabled=true;refresh.style.display='none';
+    open.hidden=true;open.disabled=true;open.style.display='none';
+    form.hidden=true;form.style.display='none';
+    document.querySelectorAll('[data-craft-source]').forEach(button=>{button.hidden=true;button.style.display='none'});
+    return;
+  }
+
   const context={
     sp1:['sp1','joelho','JOELHO · ARTICULAÇÕES'],sp2:['sp2','sarcomero','SARCÔMERO · MÚSCULO'],
     sp3:['sp3','fratura','FRATURA · TRAUMA'],sp4:['sp4','tumor','OSSO · TUMORES'],
