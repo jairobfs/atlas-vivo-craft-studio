@@ -187,7 +187,7 @@ export default async function handler(req, res) {
             const w=whole(n.w,110,1060,300),h=whole(n.h,95,710,160);
             return {
               id:limited(n.id || 'node-'+j,110),source:String(n.source),
-              x:whole(n.x,0,1100-w,0),y:whole(n.y,0,735-h,0),w,h,
+              x:whole(n.x,0,1100-w,0),y:whole(n.y,0,619-h,0),w,h,
               design:styles.has(n.design)?n.design:'standard'
             };
           })
