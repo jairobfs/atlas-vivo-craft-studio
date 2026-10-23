@@ -52,6 +52,14 @@ function textItem(item){
  if(k==='task')return '<label class="check"><input type="checkbox" disabled '+(/^- \[[xX]\]/.test(m)?'checked':'')+'><span>'+rich(m.replace(/^- \[[xX ]\]\s*/,''))+'</span></label>';
  if(k==='bullet')return '<div class="editorial-copy"><p>• '+rich(m.replace(/^[-•]\s*/,''))+'</p></div>';
  if(k==='drawing')return '<div class="notice">Prancha vetorial ou whiteboard original: abra no Craft para explorar.</div>';
+ // Split long source paragraphs into faithful sentence panels, without summarizing or inventing statements.
+ if(m.length>440){
+   const sentences=m.split(/(?<=[.!?])\s+(?=[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])/u).map(s=>s.trim()).filter(Boolean);
+   if(sentences.length>=3 && sentences.length<=12){
+     const tiles=sentences.map((s,i)=>'<div class="mini-card"><b>CONCEITO '+String(i+1).padStart(2,'0')+'</b><p>'+rich(s)+'</p></div>').join('');
+     return '<div class="cards">'+tiles+'</div>';
+   }
+ }
  return '<div class="editorial-copy"><p>'+rich(m)+'</p></div>';
 }
 function groupRender(section,idx){
