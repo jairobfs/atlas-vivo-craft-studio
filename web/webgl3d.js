@@ -231,9 +231,9 @@
   document.querySelectorAll('[data-model]').forEach(button=>button.onclick=()=>setModel(button.dataset.model));
   document.getElementById('bones-toggle').onchange=e=>{toggles.bone=e.target.checked;draw()};
   document.getElementById('ligaments-toggle').onchange=e=>{toggles.lig=e.target.checked;draw()};
-  document.getElementById('auto-rotate').onchange=e=>rotation=e.target.checked;
+  document.getElementById('auto-rotate').onchange=e=>{rotation=e.target.checked;schedule()};
   document.getElementById('reset-view').onclick=resetView;
-  document.addEventListener('click',e=>{const btn=e.target.closest('[data-3d-play]');if(btn){playing=!playing;syncControls()}});
+  document.addEventListener('click',e=>{const btn=e.target.closest('[data-3d-play]');if(btn){playing=!playing;syncControls();schedule()}});
   document.addEventListener('input',e=>{if(e.target.matches('[data-3d-progress]')){playing=false;setProgress(Number(e.target.value)/100)}});
   document.getElementById('export-model').onclick=()=>{
     let i=1;const lines=[`# Atlas Vivo · ${model}: modelo didático fora de escala`, '# Criado por JBFS · não usar para planejamento clínico'];
@@ -241,15 +241,29 @@
     const url=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download=`atlas-vivo-${model}-3d.obj`;a.click();setTimeout(()=>URL.revokeObjectURL(url),2500);
   };
   if('ResizeObserver'in window){const observer=new ResizeObserver(()=>draw());contexts.forEach(c=>observer.observe(c.canvas))}
-  let last=0;function animate(now){
-    const dt=Math.min(.065,(now-last)/1000||0);last=now;
-    if(active&&(playing||rotation)&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
-      if(rotation||(playing&&model==='tumor'))yaw+=dt*.21;
-      if(playing){progress+=dt*.25;if(progress>1)progress=0;syncControls()}
-      draw();
-    }
-    requestAnimationFrame(animate);
+  let last=0,raf=0;
+  function schedule(){
+    if(!raf&&active&&!document.hidden&&(playing||rotation)&&!matchMedia('(prefers-reduced-motion:reduce)').matches)
+      raf=requestAnimationFrame(animate);
   }
-  build();renderPanel();syncControls();requestAnimationFrame(animate);
-  window.AtlasModel3D={activate(){active=true;draw()},deactivate(){active=false},draw,setModel,resetView,selectPart,setProgress,play(){playing=true;syncControls()},stop(){playing=false;syncControls()}};
+  function animate(now){
+    raf=0;
+    const dt=Math.min(.065,last?(now-last)/1000:0);last=now;
+    if(!active||document.hidden||(!playing&&!rotation)){last=0;return}
+    if(rotation||(playing&&model==='tumor'))yaw+=dt*.21;
+    if(playing){progress+=dt*.25;if(progress>1)progress=0;syncControls()}
+    draw();schedule();
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0;last=0}
+    else schedule();
+  });
+  build();renderPanel();syncControls();
+  window.AtlasModel3D={
+    activate(){active=true;draw();schedule()},
+    deactivate(){active=false;if(raf)cancelAnimationFrame(raf);raf=0;last=0},
+    draw,setModel,resetView,selectPart,setProgress,
+    play(){playing=true;syncControls();schedule()},
+    stop(){playing=false;syncControls()}
+  };
 })();

@@ -49,6 +49,74 @@
     sp3:{q:'Qual elemento diferencia principalmente Gustilo IIIA de IIIB?',options:['O comprimento da ferida isoladamente.','A suficiência da cobertura de partes moles após o desbridamento.','O osso afetado, independentemente dos tecidos.'],correct:1,why:'A classificação considera a lesão de partes moles. No IIIA há cobertura adequada; no IIIB há perda extensa e necessidade de reconstrução de cobertura.',source:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11149747/',label:'Revisão de cobertura · IIIB'},
     sp4:{q:'Diante de suspeita de sarcoma ósseo, qual é o passo seguro antes da biópsia?',options:['Planejar investigação e trajeto com equipe especializada.','Puncionar no local mais próximo antes da imagem.','Esperar a fratura patológica para confirmar agressividade.'],correct:0,why:'O planejamento por equipe responsável pelo tratamento definitivo reduz o risco de comprometer margens e o trajeto cirúrgico.',source:'https://acsearch.acr.org/docs/69421/narrative/',label:'ACR · Tumores ósseos'}
   };
+  const chapter3d={
+    sp1:{model:'joelho',title:'Articulação: como as estruturas se relacionam?',lead:'Explore superfícies articulares, meniscos e estabilizadores. O modelo é esquemático e não substitui a inspeção clínica.',focus:[
+      {id:'meniscos',label:'Meniscos'},{id:'lca',label:'LCA'},{id:'femur',label:'Fêmur'}]},
+    sp2:{model:'sarcomero',title:'Contração: o que realmente desliza?',lead:'A actina desliza sobre a miosina durante o encurtamento do sarcômero; a cena ilustra o mecanismo, sem reproduzir a distrofina.',focus:[
+      {id:'actina',label:'Actina'},{id:'miosina',label:'Miosina'},{id:'discos',label:'Discos Z'}]},
+    sp3:{model:'fratura',title:'Fratura: osso e envelope tecidual',lead:'Observe a descontinuidade e as estruturas associadas. A classe de Gustilo depende sobretudo da lesão real de partes moles e de achados após desbridamento, não desta geometria.',focus:[
+      {id:'foco',label:'Foco ósseo'},{id:'partes',label:'Partes moles'},{id:'vasos',label:'Eixo vascular'}]},
+    sp4:{model:'tumor',title:'Tumor ósseo: localização antes da hipótese',lead:'Compare região da lesão, córtex e superfície óssea. Padrões radiográficos e diagnóstico histológico não podem ser inferidos da maquete.',focus:[
+      {id:'lesao',label:'Lesão'},{id:'osso',label:'Córtex / osso'},{id:'biopsia',label:'Biópsia · conceito'}]}
+  };
+  const chapterBridge=document.getElementById('chapter-model-bridge');
+  const bridgeParking=document.getElementById('chapter-model-parking');
+  let contextFromChapter=false;
+  function focusChapterPart(id){
+    const model=chapter3d[sp];if(!model)return;
+    const target=model.focus.find(item=>item.id===id);
+    if(!target)return;
+    window.AtlasModel3D?.selectPart(target.id);
+    const def=window.AtlasModelDefinitions?.[model.model]?.parts.find(item=>item.id===id);
+    document.getElementById('chapter-model-detail').textContent=def?.info||target.label;
+    chapterBridge?.querySelectorAll('[data-chapter-focus]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.chapterFocus===id)));
+  }
+  function syncChapterModel(){
+    if(!document.getElementById('page-capitulos')?.classList.contains('active'))return;
+    const cfg=chapter3d[sp];if(!cfg)return;
+    const title=document.getElementById('chapter-model-title'),lead=document.getElementById('chapter-model-lead'),terms=document.getElementById('chapter-model-terms');
+    if(!title||!lead||!terms)return;
+    title.textContent=cfg.title;
+    lead.textContent=cfg.lead;
+    terms.innerHTML=cfg.focus.map(x=>`<button type="button" data-chapter-focus="${x.id}" aria-pressed="false">${x.label}</button>`).join('');
+    window.AtlasModel3D?.setModel(cfg.model);
+    const focus=cfg.focus[Math.min(activeStep,2)]?.id||cfg.focus[0].id;
+    focusChapterPart(focus);
+    window.AtlasModel3D?.setProgress(activeStep===1?.5:0);
+    requestAnimationFrame(()=>window.AtlasModel3D?.draw());
+  }
+  function updateChapterFocus(){
+    if(!document.getElementById('page-capitulos')?.classList.contains('active'))return;
+    const cfg=chapter3d[sp];if(!cfg)return;
+    focusChapterPart(cfg.focus[Math.min(activeStep,2)]?.id||cfg.focus[0].id);
+    window.AtlasModel3D?.setProgress(activeStep===1?.5:activeStep===2?1:0);
+  }
+  document.getElementById('knowledge-chapters')?.addEventListener('click',event=>{
+    const button=event.target.closest('[data-chapter-focus],[data-chapter-model-action]');if(!button)return;
+    if(button.dataset.chapterFocus){window.AtlasModel3D?.stop();focusChapterPart(button.dataset.chapterFocus);return}
+    const action=button.dataset.chapterModelAction;
+    if(action==='play'){window.AtlasModel3D?.setProgress(0);window.AtlasModel3D?.play();return}
+    if(action==='reset'){window.AtlasModel3D?.stop();window.AtlasModel3D?.resetView();focusChapterPart(chapter3d[sp].focus[0].id);return}
+    if(action==='full'){
+      contextFromChapter=true;
+      window.AtlasGo?.('3d');
+      window.AtlasModel3D?.setModel(chapter3d[sp].model);
+      focusChapterPart(chapter3d[sp].focus[0].id);
+      const ret=document.getElementById('chapter-model-return');
+      if(ret)ret.hidden=false;
+      const returnTitle=document.getElementById('chapter-return-title');
+      if(returnTitle)returnTitle.textContent='Retomar '+sp.toUpperCase()+' · '+chapter3d[sp].title;
+      document.getElementById('model-canvas')?.focus({preventScroll:true});
+    }
+  });
+  document.getElementById('chapter-return-action')?.addEventListener('click',()=>{
+    if(!contextFromChapter)return;
+    window.AtlasGo?.('capitulos');
+    requestAnimationFrame(()=>document.getElementById('chapter-model-bridge')?.scrollIntoView({behavior:'smooth',block:'center'}));
+  });
+  window.addEventListener('atlas-page-changed',event=>{
+    if(event.detail?.page==='capitulos')syncChapterModel();
+  });
   let activeStep=0;
   const stateFor=key=>{
     const value=lessonProgress[key];
@@ -93,6 +161,10 @@
       wrapper.insertAdjacentHTML('afterbegin',`<div class="knowledge-stage-banner"><span>SEÇÃO ${String(i+1).padStart(2,'0')}</span><div><strong>${title}</strong><small>${sub}</small></div></div>`);
       wrapper.insertAdjacentHTML('beforeend',`<div class="knowledge-stage-actions"><button type="button" data-knowledge-mark="${i}"></button><button type="button" data-knowledge-step="${i+1}">Próxima etapa →</button></div>`);
     });
+    // Move the existing WebGL canvas INTO the chapter's theory section.
+    // Never destroy/recreate it: Safari would otherwise lose its GPU context.
+    const stageForModel=panel.querySelector('#knowledge-stage-0');
+    if(stageForModel&&chapterBridge)stageForModel.appendChild(chapterBridge);
     const checkpoint=document.createElement('section');
     checkpoint.className='knowledge-checkpoint';checkpoint.id='knowledge-stage-3';checkpoint.setAttribute('aria-label','Questão de recuperação ativa');
     checkpoint.innerHTML=`<div class="knowledge-checkpoint-kicker">SEÇÃO 04 · RECUPERAÇÃO ATIVA</div><h4>Agora, sem consultar os quadros.</h4><p>${quiz.q}</p><div class="knowledge-checkpoint-options">${quiz.options.map((option,i)=>`<button type="button" data-knowledge-choice="${i}" aria-pressed="false"><span>${'ABC'[i]}</span>${option}</button>`).join('')}</div><div class="knowledge-checkpoint-feedback" role="status" aria-live="polite" hidden></div><a href="${quiz.source}" target="_blank" rel="noopener noreferrer">Conferir fonte · ${quiz.label} ↗</a><button type="button" data-knowledge-next class="knowledge-next-chapter">Avançar ao próximo capítulo →</button>`;
@@ -134,17 +206,19 @@
     if(!panel)return;
     activeStep=0;
     lessonProgress.lastSp=sp;saveLesson();
+    if(chapterBridge&&bridgeParking)bridgeParking.appendChild(chapterBridge);
     panel.innerHTML=({sp1,sp2,sp3,sp4})[sp]();
     buildLesson();
     document.querySelectorAll('[data-knowledge]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.knowledge===sp)));
     document.querySelectorAll('.chapter-tile').forEach(b=>{b.classList.toggle('selected',b.dataset.openKnowledge===sp);b.setAttribute('aria-pressed',String(b.dataset.openKnowledge===sp));});
+    syncChapterModel();
   }
   document.getElementById('knowledge-chapters')?.addEventListener('click',event=>{
     const b=event.target.closest('button');if(!b)return;
     if(b.dataset.knowledge){sp=b.dataset.knowledge;render();return;}
     if(b.dataset.gustilo){grade=b.dataset.gustilo;const target=panel.querySelector('.gustilo-wrap');if(target)target.outerHTML=gustiloCard();return;}
     if(b.dataset.healing){phase=Number(b.dataset.healing);const target=panel.querySelector('.healing-wrap');if(target)target.outerHTML=healingCard();return;}
-    if(b.dataset.knowledgeStep){activeStep=Number(b.dataset.knowledgeStep);paintLesson();panel.querySelector(`#knowledge-stage-${activeStep}`)?.scrollIntoView({behavior:'smooth',block:'start'});return;}
+    if(b.dataset.knowledgeStep){activeStep=Number(b.dataset.knowledgeStep);paintLesson();updateChapterFocus();panel.querySelector(`#knowledge-stage-${activeStep}`)?.scrollIntoView({behavior:'smooth',block:'start'});return;}
     if(b.dataset.knowledgeMark!==undefined){const state=stateFor(sp),index=Number(b.dataset.knowledgeMark);state.done[index]=!state.done[index];saveLesson();paintLesson();return;}
     if(b.dataset.knowledgeChoice!==undefined){stateFor(sp).answer=Number(b.dataset.knowledgeChoice);saveLesson();paintLesson();return;}
     if(b.hasAttribute('data-knowledge-next')){const order=['sp1','sp2','sp3','sp4'];sp=order[(order.indexOf(sp)+1)%order.length];render();document.getElementById('knowledge-chapters')?.scrollIntoView({behavior:'smooth',block:'start'});return;}

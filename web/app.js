@@ -59,11 +59,12 @@
     document.getElementById('crumb-current').textContent=names[page];
     if(updateHash)history.replaceState(null,'',`#${page}`);
     window.scrollTo({top:0,behavior:'instant'});
-    if(window.AtlasModel3D){if(page==='3d'||page==='sps'||page==='atlas')window.AtlasModel3D.activate();else window.AtlasModel3D.deactivate()}
+    if(window.AtlasModel3D){if(page==='3d'||page==='sps'||page==='atlas'||page==='capitulos')window.AtlasModel3D.activate();else window.AtlasModel3D.deactivate()}
     if(page==='sps')window.AtlasTheoryRestore?.();
     if(page==='atlas')window.AtlasManeuverRefresh?.();
     if(page==='clinica')window.AtlasClinicalRefresh?.();
     window.AtlasJourneyRefresh?.();
+    window.dispatchEvent(new CustomEvent('atlas-page-changed',{detail:{page}}));
   }
   window.AtlasGo=go;
   document.addEventListener('click',e=>{
@@ -116,6 +117,9 @@
   window.AtlasOpenTheory=(key,scroll=false)=>openTheory(key,scroll);
   // Initialize the 3D laboratory without overriding the student's last chapter.
   openTheory('sp1',false,false);
+  // Reapply the selected chapter's model on direct entry via /#capitulos.
+  if(document.getElementById('page-capitulos')?.classList.contains('active'))
+    window.dispatchEvent(new CustomEvent('atlas-page-changed',{detail:{page:'capitulos'}}));
   window.AtlasTheoryRestore=()=>openTheory(theory);
 
   function getLocal(key,fallback){try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fallback}catch{return fallback}}

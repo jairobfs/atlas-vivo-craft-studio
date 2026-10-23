@@ -619,3 +619,33 @@ main{padding-top:40px}.kicker,.eyebrow{font-size:12px;line-height:1.5}
 .progress-vault-feedback:empty{display:none}
 @media(max-width:600px){.progress-vault{padding:18px 16px}.progress-vault-head{gap:11px}.progress-vault-mark{width:42px;height:42px;flex-basis:42px}.progress-vault-head h2{font-size:27px}.progress-vault-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.progress-vault-actions button{min-width:0;min-height:53px;padding:10px 8px;font-size:12px;gap:6px}.progress-vault-actions svg{width:18px;height:18px}}
 @media(max-width:345px){.progress-vault-actions{grid-template-columns:1fr}.progress-vault-actions button{font-size:14px}}
+
+/* V20 · 3D pedagógico integrado à primeira seção teórica, sem contexto WebGL adicional */
+.craft-reader-layout{grid-template-columns:minmax(0,1fr)}
+.chapter-model-bridge{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:0;border:1px solid #226275;border-radius:19px;overflow:hidden;background:#082632;color:#ecfaf5;margin:23px 0 18px;min-height:365px}
+.chapter-model-copy{padding:clamp(20px,3.6vw,30px);display:flex;flex-direction:column;gap:11px;min-width:0}
+.chapter-model-copy .kicker{color:#81ded2;font-size:12px}
+.chapter-model-copy h4{font:650 clamp(25px,3vw,33px)/1.16 Fraunces,Georgia,serif;color:#f7fbf9;margin:0}
+.chapter-model-copy>p{font-size:15px;line-height:1.58;color:#d0e5e5;margin:0}
+.chapter-model-copy .chapter-model-caveat{font-size:12px;color:#a5bfc3}
+.chapter-model-terms{display:flex;flex-wrap:wrap;gap:9px;margin-top:8px}
+.chapter-model-terms button{min-height:43px;padding:10px 13px;border:1px solid #6599a6;border-radius:12px;background:#103b4a;color:#e9f7f5;font-size:13px;font-weight:750;cursor:pointer}
+.chapter-model-terms button[aria-pressed="true"]{background:#a1ebe0;color:#052e38;border-color:#a1ebe0}
+.chapter-model-detail{flex:1;min-height:40px;border-left:3px solid #59c5b8;padding:9px 0 9px 13px;color:#d8f1ed!important;font-size:14px!important}
+.chapter-model-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
+.chapter-model-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:1 1 125px;border:1px solid #60a4a9;border-radius:11px;padding:11px 10px;min-height:49px;background:#184e58;color:#eafcf6;font-size:12px;font-weight:800;cursor:pointer}
+.chapter-model-actions button[data-chapter-model-action="play"]{background:#8dded1;border-color:#8dded1;color:#0c2a34}
+.chapter-model-actions button:focus-visible,.chapter-model-terms button:focus-visible,.chapter-model-return button:focus-visible{outline:3px solid #f0b77a;outline-offset:2px}
+.chapter-model-actions svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chapter-model-visual{position:relative;min-width:0;display:flex;flex-direction:column;justify-content:center;background:radial-gradient(circle at 52% 42%,#1b5669,#051a24 72%)}
+.chapter-model-overline,.chapter-model-stage-note{font-size:11px;letter-spacing:.05em;font-weight:800;color:#a1cbd1;text-align:center;padding:11px 10px 0}
+.chapter-model-stage-note{padding:0 12px 16px}
+.chapter-model-visual #craft-context-canvas{display:block;width:100%;height:clamp(290px,31vw,410px);min-height:290px;cursor:grab;touch-action:none}
+.chapter-model-visual #craft-context-canvas:active{cursor:grabbing}
+.chapter-model-visual .canvas-structure-caption{font-size:12px;color:#b8f1e2;bottom:40px;left:16px;right:16px;pointer-events:none;text-align:center}
+.chapter-model-return{display:flex;align-items:center;justify-content:space-between;gap:16px;border-radius:14px;background:var(--pale);border:1px solid var(--line);padding:14px 18px;margin:10px 0 17px;color:var(--ink)}
+.chapter-model-return>div{display:grid;gap:3px}.chapter-model-return span{font-size:10px;letter-spacing:.07em;font-weight:900;color:var(--teal)}.chapter-model-return strong{font-size:15px}
+.chapter-model-return button{min-height:48px;border-radius:11px;border:1px solid var(--teal);padding:12px 17px;font-size:14px;font-weight:800;background:var(--paper);color:var(--teal)}
+@media(max-width:820px){.chapter-model-bridge{grid-template-columns:1fr}.chapter-model-visual{min-height:340px}.chapter-model-visual #craft-context-canvas{height:390px}.chapter-model-copy{padding:23px 20px}.chapter-model-bridge{margin:19px 0}}
+@media(max-width:600px){.chapter-model-bridge{border-radius:17px}.chapter-model-copy h4{font-size:29px}.chapter-model-visual #craft-context-canvas{height:clamp(310px,43svh,440px)}.chapter-model-copy>p{font-size:14px}.chapter-model-actions button{flex:1 1 140px;min-height:52px;font-size:13px}.chapter-model-terms button{min-height:47px}.chapter-model-return{flex-direction:column;align-items:stretch;padding:15px}.chapter-model-return button{width:100%}}
+@media(prefers-reduced-motion:reduce){.chapter-model-bridge{scroll-behavior:auto}}
