@@ -81,8 +81,8 @@ function atlas(){
  $('#refresh').onclick=()=>{if(S.demo){S.project=compile(demo());atlas()}else openDoc(S.docId)};
  $('#atlas-mode').onclick=()=>{S.mode='atlas';atlas()};$('#map-mode').onclick=()=>{S.mode='map';atlas()};$('#presentation-mode').onclick=()=>{S.mode='presentation';S.presentationIndex=0;atlas()};
  $('#visual-edit').onclick=()=>{S.editorMode='edit';navigate('studio')};$('#print').onclick=()=>window.print();
- $('[data-zoom]').forEach(img=>img.onclick=()=>zoom(img.dataset.zoom,img.alt));
- $('[data-map-jump]').forEach(b=>b.onclick=e=>{e.preventDefault();S.mode='atlas';atlas();document.getElementById(b.dataset.mapJump)?.scrollIntoView({behavior:'smooth'})});
+ $$('[data-zoom]').forEach(img=>img.onclick=()=>zoom(img.dataset.zoom,img.alt));
+ $$('[data-map-jump]').forEach(b=>b.onclick=e=>{e.preventDefault();S.mode='atlas';atlas();document.getElementById(b.dataset.mapJump)?.scrollIntoView({behavior:'smooth'})});
  const prev=$('#previous-slide'),next=$('#next-slide');if(prev)prev.onclick=()=>{S.presentationIndex=Math.max(0,S.presentationIndex-1);atlas()};if(next)next.onclick=()=>{S.presentationIndex=Math.min(S.project.sections.length-1,S.presentationIndex+1);atlas()};
 }
 function renderPresentation(data){
