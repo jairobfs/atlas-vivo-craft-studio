@@ -166,6 +166,10 @@ export default async function handler(req, res) {
         return json(res, 200, { documentId: targetId, config: parseSaved(), source: 'craft' });
       }
       if (req.method !== 'POST') return json(res, 405, { error: 'Método inválido' });
+      const currentLayout = parseSaved();
+      if (currentLayout && payload.previousUpdatedAt !== currentLayout.updatedAt) {
+        return json(res, 409, { error: 'Outra edição da composição foi salva no Craft. Reabra o atlas antes de gravar.' });
+      }
       const cfg = payload.config;
       if (!cfg || typeof cfg !== 'object' || !Array.isArray(cfg.order) || cfg.order.length > 150) {
         return json(res, 400, { error: 'Composição visual inválida' });
