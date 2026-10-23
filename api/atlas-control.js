@@ -82,14 +82,16 @@ export function safeControl(settings) {
 }
 export function matchesNote(entry,item){
   const original=String(item||'').trim();
-  const [label,id]=original.includes('|')?original.split(/\s+\|\s+/):[original,''];
-  const ids=[entry?.id,entry?.rootBlockId,entry?.documentId].filter(Boolean).map(normalize);
-  return ids.includes(normalize(label))||ids.includes(normalize(id))||
-    normalize(entry?.title?.text||entry?.title?.markdown||entry?.title||entry?.name||entry?.markdown)===normalize(label);
+  const [label,explicitId='']=original.includes('|')?original.split(/\s+\|\s+/):[original,''];
+  const doc=entry||{};
+  const ids=[doc.id,doc.rootBlockId,doc.documentId,doc.exposedDocumentId,doc?.document?.id,doc?.document?.rootBlockId].filter(Boolean).map(normalize);
+  const t=doc?.title?.text?.value??doc?.title?.value??doc?.title?.markdown??doc?.title?.text??doc?.title??doc?.name??doc?.markdown??doc?.document?.title;
+  const displayed=typeof t==='string'?t:typeof t?.value==='string'?t.value:'';
+  return ids.includes(normalize(label))||Boolean(explicitId&&ids.includes(normalize(explicitId)))||normalize(displayed)===normalize(label);
 }
 export function filterLibrary(result,settings){
   if(!settings||settings.libraryMode!=='selected')return result;
-  const filtered=arr=>Array.isArray(arr)?arr.map(doc=>({doc,position:settings.visibleNotes.findIndex(item=>matchesNote(doc,item))})).filter(x=>x.position!==-1).sort((a,b)=>a.position-b.position).map(x=>x.doc):arr;
+  const filtered=arr=>Array.isArray(arr)?arr.filter(doc=>!(doc?.deleted===true||doc?.isDeleted===true||doc?.location==='trash')).map(doc=>({doc,position:settings.visibleNotes.findIndex(item=>matchesNote(doc,item))})).filter(x=>x.position!==-1).sort((a,b)=>a.position-b.position).map(x=>x.doc):arr;
   if(Array.isArray(result))return filtered(result);
   if(Array.isArray(result?.items))return {...result,items:filtered(result.items)};
   if(Array.isArray(result?.documents))return {...result,documents:filtered(result.documents)};
