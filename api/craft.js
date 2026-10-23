@@ -87,6 +87,9 @@ export default async function handler(req, res) {
     if (op === 'status') {
       return json(res, 200, { configured: Boolean(base()), authenticated: authenticated(req,control), controlReady: Boolean(control), controlError });
     }
+    if (validId(process.env.ATLAS_CONTROL_ROOT_ID) && !control && op !== 'logout') {
+      return json(res, 503, { error: 'Central de Controle do Craft indisponível. Verifique a nota administrativa e tente novamente.' });
+    }
     if (op === 'login') {
       if (req.method !== 'POST') return json(res, 405, { error: 'Método não permitido' });
       const body = await input(req);
