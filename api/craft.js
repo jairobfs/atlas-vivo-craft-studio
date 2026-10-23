@@ -175,6 +175,26 @@ export default async function handler(req, res) {
         return json(res, 400, { error: 'Composição visual inválida' });
       }
       const validLayouts = new Set(['editorial','panorama','mosaic','spotlight','story']);
+      const sanitizeCanvas = (spatial) => {
+        if (!spatial || !Array.isArray(spatial.boards)) return null;
+        const skins = new Set(['dark','light','paper']);
+        const styles = new Set(['standard','hero','warning','picture','transparent']);
+        const boards = spatial.boards.slice(0,18).filter(b => b && typeof b === 'object').map((b,i) => ({
+          id: limited(b.id || 'board-' + i,130),
+          title: limited(b.title || 'Prancha',120),
+          nodes: (Array.isArray(b.nodes) ? b.nodes : []).slice(0,24).filter(n => n && validId(n.source)).map((n,j) => {
+            const whole=(v,min,max,fallback)=>Math.max(min,Math.min(max,Number.isFinite(Number(v))?Math.round(Number(v)):fallback));
+            const w=whole(n.w,110,1060,300),h=whole(n.h,95,710,160);
+            return {
+              id:limited(n.id || 'node-'+j,110),source:String(n.source),
+              x:whole(n.x,0,1100-w,0),y:whole(n.y,0,735-h,0),w,h,
+              design:styles.has(n.design)?n.design:'standard'
+            };
+          })
+        })).filter(b=>b.id);
+        return {version:1,skin:skins.has(spatial.skin)?spatial.skin:'dark',boards};
+      };
+      const canvas = cfg.canvas === undefined ? currentLayout?.canvas : sanitizeCanvas(cfg.canvas);
       const normalized = {
         version: 1,
         layout: validLayouts.has(cfg.layout) ? cfg.layout : 'editorial',
@@ -185,9 +205,11 @@ export default async function handler(req, res) {
           display: ['full','half','feature','hidden'].includes(x.display) ? x.display : 'full',
           order: i
         })).filter(x => x.source),
+        canvas: canvas || null,
         updatedAt: new Date().toISOString()
       };
       const markdown = prefix + JSON.stringify(normalized);
+      if (markdown.length > 30000) return json(res, 413, { error: 'Composição grande demais para um bloco do Craft. Divida em menos pranchas.' });
       let result;
       if (existing?.id) {
         result = await craft('/blocks', {
