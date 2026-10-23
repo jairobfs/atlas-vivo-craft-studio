@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 // ATLAS VIVO · Craft-native administration.
 // The Craft page is the single source of truth for owner-editable preferences.
 // Never serialize the accessCode to the browser or to application logs.
@@ -13,6 +14,7 @@ export function parseControlDocument(response) {
   const blocks=Array.isArray(page?.content)?page.content:[];
   const settings={
     source:'craft',
+    revision:createHash('sha256').update(blocks.map(b=>String(b?.id||'')+'\u0000'+raw(b)).join('\u0001')).digest('hex'),
     accessCode:'',
     sessionDays:30,
     libraryMode:'all',
