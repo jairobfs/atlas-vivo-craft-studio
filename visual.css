@@ -39,3 +39,15 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:var(--ink)
 .audit-row strong{font-size:11px;color:var(--amber)}
 .audit-row>span:nth-child(2){flex:1;overflow-wrap:anywhere}
 @media(max-width:550px){.figure-audit-modal{padding:10px}.audit-panel{padding:16px}.audit-row{align-items:flex-start;flex-wrap:wrap}.audit-row .chip{margin-left:auto}}
+
+/* Craft-native control center; configuration text is editable only inside Craft. */
+.control-hero{background:radial-gradient(circle at 95% 0%,#3fc4bc22,transparent 48%),linear-gradient(130deg,var(--surface),var(--surface2));border-top:3px solid var(--aqua)}
+.control-hero h1{max-width:780px;font-size:clamp(29px,4vw,43px);line-height:1.1}
+.control-row{display:grid;grid-template-columns:39px minmax(0,1fr);align-items:center;gap:11px;border-bottom:1px solid var(--line);padding:15px 7px}
+.control-row:last-child{border-bottom:0}
+.control-row strong{font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+.control-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.control-options>div{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:var(--surface2);display:grid;gap:4px}
+.control-options span{font-size:11px;letter-spacing:.2px;color:var(--muted)}
+.control-options strong{font-size:16px;color:var(--ink)}
+@media(max-width:500px){.control-options{grid-template-columns:1fr}.control-hero .actions{display:grid}.control-hero .actions .btn{width:100%}}
