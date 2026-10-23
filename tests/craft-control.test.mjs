@@ -131,3 +131,11 @@ test('Server handles search results by exposedDocumentId and has short-lived Cra
  assert.match(code,/safeControl\(control\)/);
  assert.match(code,/filterLibrary\(await craft\('\/documents\?fetchMetadata=true'\)/);
 });
+
+
+test('Craft control errors cannot silently enable legacy login as a fallback', async()=>{
+ const {readFileSync}=await import('node:fs');
+ const code=readFileSync(new URL('../api/craft.js',import.meta.url),'utf8');
+ assert.match(code,/validId\(process\.env\.ATLAS_CONTROL_ROOT_ID\) && !control/);
+ assert.match(code,/503, \{ error: 'Central de Controle do Craft indisponível/);
+});
