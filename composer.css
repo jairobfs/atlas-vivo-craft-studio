@@ -1,5 +1,5 @@
 
-/* ATLAS VIVO · Compositor espacial v1. Native 1100 × 735 board, responsive scale */
+/* ATLAS VIVO · Compositor espacial v1. Native 1100 × 619 board, responsive scale */
 .compose-root{--cx:#56c9c7;--cink:#ecf9f7;--csub:#9fbdc1;display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;align-items:start}
 .compose-header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;padding:12px 0 3px}
 .compose-header h1{font-size:clamp(26px,3.1vw,35px);margin:7px 0}
@@ -12,7 +12,7 @@
 .compose-status[data-status=error] .compose-status-dot{background:var(--danger)}
 .compose-scroll{overflow:hidden;border:1px solid var(--line);background:repeating-linear-gradient(45deg,var(--surface2) 0 10px,var(--surface) 10px 20px);border-radius:16px;padding:11px}
 .compose-viewport{width:100%;position:relative;overflow:hidden}
-.compose-board{position:absolute;top:0;left:0;width:1100px;height:735px;transform-origin:top left;overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#081b26,#0d3038);box-shadow:0 12px 35px #0004;color:#e9f6f5}
+.compose-board{position:absolute;top:0;left:0;width:1100px;height:619px;transform-origin:top left;overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#081b26,#0d3038);box-shadow:0 12px 35px #0004;color:#e9f6f5}
 .compose-board[data-skin=light]{background:linear-gradient(135deg,#fafffe,#e9f5f3);color:#133840}
 .compose-board[data-skin=paper]{background:#faf8f2;color:#273d43}
 .compose-board:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(#56c9c709 1px,transparent 1px),linear-gradient(90deg,#56c9c709 1px,transparent 1px);background-size:30px 30px}
@@ -76,4 +76,4 @@
 .compose-board .board-footer{position:absolute;bottom:18px;right:26px;font-size:10px;letter-spacing:1.5px;color:#99cecd;pointer-events:none}
 @media(max-width:1030px){.compose-root{grid-template-columns:1fr}.compose-header{grid-column:1}.compose-inspector{position:relative;top:auto;max-height:none}.compose-inspector .compose-library{max-height:180px}.compose-header h1{font-size:30px}}
 @media(max-width:720px){.compose-root{gap:10px}.compose-header{gap:7px}.compose-header h1{font-size:27px}.compose-tools{gap:5px;padding:10px}.compose-inspector{padding:14px}.compose-chips{gap:5px}.compose-chips .btn{font-size:11px;padding:7px 9px}.compose-scroll{padding:6px}}
-@media print{.compose-header,.compose-inspector,.compose-tools,.compose-guide,.compose-bottomnote{display:none!important}.compose-root{display:block}.compose-scroll{border:0;padding:0;background:white}.compose-viewport{width:1100px!important;height:735px!important}.compose-board{transform:none!important;position:relative!important;width:1100px!important;height:735px!important;break-after:page}.compose-block{box-shadow:none}.compose-resize{display:none}}
+@media print{.compose-header,.compose-inspector,.compose-tools,.compose-guide,.compose-bottomnote{display:none!important}.compose-root{display:block}.compose-scroll{border:0;padding:0;background:white}.compose-viewport{width:1100px!important;height:619px!important}.compose-board{transform:none!important;position:relative!important;width:1100px!important;height:619px!important;break-after:page}.compose-block{box-shadow:none}.compose-resize{display:none}}
