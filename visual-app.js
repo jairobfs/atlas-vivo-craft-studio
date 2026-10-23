@@ -102,7 +102,8 @@ function studio(){
  }
 }
 function login(){
- $('#screen').innerHTML='<div class="login"><div class="eyebrow">ATLAS VIVO · ACESSO PRIVADO</div><h1>Estudo visual conectado ao Craft.</h1><p class="muted">Conexão e credenciais permanecem no servidor. A biblioteca só é carregada depois do login.</p><div class="panel"><label for="key">Código de acesso</label><input id="key" type="password" class="field" autocomplete="current-password" placeholder="Digite o código privado"><button class="btn primary" id="enter" style="width:100%">Entrar no Studio</button><div id="err" class="mini muted"></div></div></div>';
+ $('#screen').innerHTML='<div class="login"><div class="eyebrow">ATLAS VIVO · ACESSO PRIVADO</div><h1>Estudo visual conectado ao Craft.</h1><p class="muted">Conexão e credenciais permanecem no servidor. A biblioteca só é carregada depois do login.</p><div class="panel"><label for="key">Código de acesso</label><input id="key" type="password" class="field" autocomplete="current-password" placeholder="Digite o código privado"><button class="btn primary" id="enter" style="width:100%">Entrar no Studio</button><button class="btn outline" id="preview" style="width:100%;margin-top:10px">Conhecer atlas visual de demonstração</button><div id="err" class="mini muted"></div></div></div>';
+ $('#preview').onclick=()=>{S.demo=true;S.auth=true;S.docs=[];S.doc=demo();S.docId='';S.project=compile(S.doc);S.mode='atlas';navigate('atlas')};
  $('#enter').onclick=async()=>{let b=$('#enter');b.disabled=true;try{await API('login',{}, {password:$('#key').value});S.auth=true;await sync();navigate('home')}catch(e){$('#err').textContent=e.message}finally{b.disabled=false}};$('#key').onkeydown=e=>{if(e.key==='Enter')$('#enter').click()};
 }
 function render(){$('#logout').classList.toggle('hide',!S.auth);if(!S.auth)return login();if(S.tab==='home')landing();else if(S.tab==='library')library();else if(S.tab==='atlas')atlas();else studio()}
@@ -110,5 +111,5 @@ async function sync(){if(S.loading)return;S.loading=true;try{const [d,c]=await P
 async function openDoc(documentId){if(!documentId)return;try{const d=await API('document',{id:documentId});S.doc=d;S.docId=documentId;S.project=compile(d);S.demo=false;S.mode='atlas';navigate('atlas')}catch(e){inform('Falha ao abrir documento: '+e.message)}}
 $('#theme').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('atlas-theme',document.body.classList.contains('light')?'light':'dark')};
 if(S.theme==='light')document.body.classList.add('light');
-$('#logout').onclick=async()=>{try{await API('logout')}catch{}S.auth=false;S.doc=null;S.project=null;S.docs=[];navigate('home')};
+$('#logout').onclick=async()=>{if(!S.demo){try{await API('logout')}catch{}}S.demo=false;S.auth=false;S.doc=null;S.project=null;S.docs=[];navigate('home')};
 updateNav();(async()=>{try{const st=await API('status');S.auth=!!st.authenticated;if(S.auth)await sync();render()}catch{render()}})();
