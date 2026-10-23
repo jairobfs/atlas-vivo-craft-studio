@@ -5,3 +5,25 @@ body.light{color-scheme:light;--bg:#f5f9f7;--surface:#fff;--surface2:#eaf5f3;--s
 @media(max-width:720px){.app{display:block}.sidebar{display:none}.main{padding:20px 15px 110px}.hero{padding:24px}.prancha{padding:19px}.article-head{padding:21px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tile{padding:14px;min-height:145px}.tile h3{font-size:15px}.stats{gap:9px}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);justify-content:space-around;padding:9px 5px calc(9px + env(safe-area-inset-bottom));z-index:40}.mobile-nav button{background:none;border:0;font-size:11px;font-weight:700;color:var(--muted);padding:4px 7px}.mobile-nav button.active{color:var(--aqua)}.compare{grid-template-columns:1fr}.flow-node{min-width:174px}.figure-grid{grid-template-columns:1fr 1fr}.figure.featured{grid-column:span 2}.topbar{margin-bottom:17px}}
 @media(max-width:355px){.grid{grid-template-columns:1fr}.figure-grid{grid-template-columns:1fr}.figure.featured{grid-column:auto}}
 @media print{body{background:white!important;color:#142e39!important}.sidebar,.topbar,.mobile-nav,.actions,.block-actions{display:none!important}.app{display:block}.main{padding:0}.prancha,.article-head{break-inside:avoid;box-shadow:none}.callout{break-inside:avoid}.figure img{max-height:350px}.article{max-width:none}}
+
+
+/* v2.1 · Visual knowledge architecture, panoramic whiteboards and responsive diagrams. */
+.presentation-stage{margin-top:18px}.presentation-controls{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px;background:var(--surface2);border:1px solid var(--line);padding:12px 15px;border-radius:12px}
+.presentation-stage>.prancha{aspect-ratio:16/9;min-height:420px;display:flex;flex-direction:column;justify-content:flex-start;gap:10px;border:1px solid var(--aqua);background:radial-gradient(ellipse at top right,#0aa5ad16,transparent 48%),var(--surface);overflow:auto}
+.presentation-stage>.prancha .editorial-copy{max-width:none}.presentation-stage>.prancha .figure-grid{grid-auto-flow:column;grid-auto-columns:minmax(200px,1fr);overflow-x:auto}.presentation-stage>.prancha .figure{max-height:480px}
+.map-prancha{background:radial-gradient(ellipse at 50% 25%,#0aa5ad13,transparent 56%),var(--surface)}
+.concept-web{display:grid;grid-template-columns:minmax(210px,.85fr) minmax(0,1.8fr);gap:28px;align-items:center;padding:26px 4px;position:relative}
+.concept-web:before{content:"";position:absolute;left:29%;top:17%;bottom:17%;width:2px;background:linear-gradient(180deg,transparent,var(--aqua),transparent);opacity:.36;pointer-events:none}
+.map-hub{border:1px solid var(--aqua);background:var(--surface2);border-radius:24px;padding:26px;box-shadow:var(--shadow);position:relative;z-index:1}
+.map-hub h2{font-size:clamp(21px,3vw,30px);margin:10px 0}
+.concept-leaves{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.map-leaf{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-left:4px solid var(--aqua);border-radius:14px;padding:17px 18px;color:var(--ink);background:var(--surface2);position:relative;transition:transform .16s,border-color .16s}
+.map-leaf:before{content:"";position:absolute;top:50%;left:-28px;width:26px;height:1px;background:var(--aqua);opacity:.4}
+.map-leaf:hover{transform:translateY(-2px);border-color:var(--aqua);text-decoration:none}
+.map-leaf strong{font-size:15px;line-height:1.3}
+.cards .mini-card{border-top:3px solid var(--aqua);min-height:120px}
+mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:var(--ink);border-radius:3px;padding:0 3px}
+@media(max-width:860px){.concept-web{grid-template-columns:1fr;gap:17px}.concept-web:before,.map-leaf:before{display:none}.map-hub{padding:20px}.concept-leaves{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.presentation-stage>.prancha{min-height:390px;aspect-ratio:auto;max-height:70dvh;overflow:auto}.presentation-controls{gap:9px}.concept-leaves{grid-template-columns:1fr}.concept-web{padding:16px 0}.map-hub{padding:19px}.map-leaf{padding:14px}.cards{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.cards{grid-template-columns:1fr}}
+@media print{.presentation-controls{display:none}.presentation-stage>.prancha{min-height:auto;aspect-ratio:auto;overflow:visible;break-after:page}.concept-web:before,.map-leaf:before{display:none}}
