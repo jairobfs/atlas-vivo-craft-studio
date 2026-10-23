@@ -127,8 +127,19 @@ function login(){
 }
 function render(){$('#logout').classList.toggle('hide',!S.auth);if(!S.auth)return login();if(S.tab==='home')landing();else if(S.tab==='library')library();else if(S.tab==='atlas')atlas();else studio()}
 async function sync(){if(S.loading)return;S.loading=true;try{const [d,c]=await Promise.all([API('documents'),API('connection')]);S.docs=list(d);S.connection=c;render();inform(S.docs.length+' documentos carregados do Craft')}catch(e){inform('Craft: '+e.message)}finally{S.loading=false}}
-async function openDoc(documentId){if(!documentId)return;try{const d=await API('document',{id:documentId});S.doc=d;S.docId=documentId;S.project=compile(d);S.demo=false;S.mode='atlas';navigate('atlas')}catch(e){inform('Falha ao abrir documento: '+e.message)}}
+async function openDoc(documentId,preserveMode=false){if(!documentId)return;const previous=S.mode;try{const d=await API('document',{id:documentId});S.doc=d;S.docId=documentId;S.project=compile(d);S.demo=false;S.mode=preserveMode?previous:'atlas';navigate('atlas')}catch(e){inform('Falha ao abrir documento: '+e.message)}}
 $('#theme').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('atlas-theme',document.body.classList.contains('light')?'light':'dark')};
 if(S.theme==='light')document.body.classList.add('light');
 $('#logout').onclick=async()=>{if(!S.demo){try{await API('logout')}catch{}}S.demo=false;S.auth=false;S.doc=null;S.project=null;S.docs=[];navigate('home')};
+
+let lastAutoRefresh=0;
+function refreshOnReturn(){
+ if(!S.auth||S.demo||S.tab!=='atlas'||!S.docId)return;
+ const now=Date.now();
+ if(now-lastAutoRefresh<15000)return;
+ lastAutoRefresh=now;
+ openDoc(S.docId,true);
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshOnReturn()});
+window.addEventListener('focus',refreshOnReturn);
 updateNav();(async()=>{if(new URLSearchParams(location.search).get('demo')==='1'){S.auth=true;S.demo=true;S.docs=[];S.doc=demo();S.docId='';S.project=compile(S.doc);S.mode='atlas';navigate('atlas');return}try{const st=await API('status');S.auth=!!st.authenticated;if(S.auth)await sync();render()}catch{render()}})();
