@@ -60,8 +60,9 @@ async function craft(path, options = {}) {
 }
 // Cache Craft configuration briefly between requests in the same warm serverless instance.
 let cachedCraftControl = null, controlCacheUntil = 0, controlReadInFlight = null;
-async function readCraftControl() {
+async function readCraftControl(force = false) {
   const id = process.env.ATLAS_CONTROL_ROOT_ID;
+  if (force) { cachedCraftControl = null; controlCacheUntil = 0; }
   if (!validId(id)) return null;
   if (cachedCraftControl && Date.now() < controlCacheUntil) return cachedCraftControl;
   if (controlReadInFlight) return controlReadInFlight;
@@ -104,11 +105,19 @@ export default async function handler(req, res) {
       res.setHeader('Set-Cookie', 'av_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0; Secure');
       return json(res, 200, { ok: true });
     }
+    if (!authenticated(req,control) && validId(process.env.ATLAS_CONTROL_ROOT_ID)) {
+      // Another serverless instance may hold an old password during rotation.
+      // Re-read Craft before rejecting a newly rotated session cookie.
+      try { control = await readCraftControl(true); } catch { return json(res, 503, { error: 'Central do Craft temporariamente indisponível' }); }
+    }
     if (!authenticated(req,control)) return json(res, 401, { error: 'Entre com o código configurado no Craft' });
-    if (op === 'control' && req.method === 'GET') return json(res, 200, {
+    if (op === 'control' && req.method === 'GET') {
+      if (u.searchParams.get('refresh') === '1') control = await readCraftControl(true);
+      return json(res, 200, {
       ...safeControl(control), controlError,
       craftUrl: 'https://docs.craft.do/editor/d/c3b34bfd-9b77-6809-f4d0-a206276df43a/3dac343a-bb21-81b7-db40-70de6fd8a51f'
     });
+    }
     if (op === 'catalog' && req.method === 'GET') {
       const docs = await craft('/documents?fetchMetadata=true');
       return json(res, 200, { items: publicCatalog(docs,process.env.ATLAS_CONTROL_ROOT_ID) });
