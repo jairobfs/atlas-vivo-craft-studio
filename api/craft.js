@@ -57,11 +57,23 @@ async function craft(path, options = {}) {
   }
   return data;
 }
+// Cache Craft configuration briefly between requests in the same warm serverless instance.
+let cachedCraftControl = null, controlCacheUntil = 0, controlReadInFlight = null;
 async function readCraftControl() {
   const id = process.env.ATLAS_CONTROL_ROOT_ID;
   if (!validId(id)) return null;
-  const data = await craft('/blocks?id=' + encodeURIComponent(id) + '&maxDepth=1');
-  return parseControlDocument(data);
+  if (cachedCraftControl && Date.now() < controlCacheUntil) return cachedCraftControl;
+  if (controlReadInFlight) return controlReadInFlight;
+  controlReadInFlight = craft('/blocks?id=' + encodeURIComponent(id) + '&maxDepth=1')
+    .then(data => {
+      const parsed = parseControlDocument(data);
+      if (!parsed?.accessCode) throw Object.assign(new Error('Código não configurado na Central Craft'), { status: 503 });
+      cachedCraftControl = parsed;
+      controlCacheUntil = Date.now() + 8000; // edits propagate after ~8s per warm instance
+      return parsed;
+    })
+    .finally(() => { controlReadInFlight = null; });
+  return controlReadInFlight;
 }
 
 export default async function handler(req, res) {
@@ -112,7 +124,12 @@ export default async function handler(req, res) {
     if (op === 'search' && req.method === 'GET') {
       const q = limited(u.searchParams.get('q'), 120).trim();
       if (q.length < 2) return json(res, 400, { error: 'Pesquisa muito curta' });
-      return json(res, 200, filterLibrary(await craft('/documents/search?include=' + encodeURIComponent(q)), control));
+      const results = await craft('/documents/search?include=' + encodeURIComponent(q));
+      if (!control || control.libraryMode !== 'selected' || !Array.isArray(results?.items)) return json(res, 200, results);
+      // Search results have exposedDocumentId; unlike GET /documents they are not document objects.
+      const catalog = filterLibrary(await craft('/documents?fetchMetadata=true'),control);
+      const included = new Set((catalog?.items||catalog?.documents||[]).map(x=>x.rootBlockId||x.id||x.documentId).filter(Boolean));
+      return json(res, 200, {...results,items:results.items.filter(x=>included.has(x.exposedDocumentId||x.documentId||x.rootBlockId))});
     }
     if (op === 'create' && req.method === 'POST') {
       const b = await input(req);
