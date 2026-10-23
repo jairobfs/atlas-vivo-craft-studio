@@ -1,13 +1,13 @@
 {
-  "name": "atlas-vivo-craft-studio",
-  "version": "0.3.0",
+  "name": "atlas-vivo-uct20",
+  "version": "4.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.mjs",
-    "start": "node server.mjs"
-  },
-  "engines": {
-    "node": ">=20"
+    "build": "node scripts/build-worker.mjs",
+    "dev": "node scripts/dev-worker.mjs",
+    "start": "node scripts/render-server.mjs",
+    "test": "node tests/atlas-smoke.mjs && node tests/mechanism-smoke.mjs && node tests/clinical-smoke.mjs",
+    "test:craft": "node tests/craft-worker-smoke.mjs"
   }
 }

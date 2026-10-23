@@ -1,0 +1,15 @@
+{
+  "name": "Atlas Vivo · UCT20",
+  "short_name": "Atlas Vivo",
+  "description": "Tutoria médica, mecanismos 3D e biblioteca Craft integrada.",
+  "lang": "pt-BR",
+  "start_url": "/#inicio",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b2330",
+  "theme_color": "#0b2330",
+  "icons": [
+    {"src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any"},
+    {"src": "/apple-touch-icon.png", "type": "image/png", "sizes": "180x180", "purpose": "any"}
+  ]
+}

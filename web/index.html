@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b2330">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Atlas Vivo">
+  <meta name="description" content="Atlas Vivo UCT20: 34 manobras, 35 estudos comentados, exposições integradas em 2D/3D e notas Craft.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <title>Atlas Vivo · UCT20 | JBFS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,600,50,0;9..144,700,50,0&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/clinical-lab.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Menu principal">
+      <a class="brand" href="#inicio" data-nav="inicio" aria-label="Atlas Vivo, início"><span class="brand-glyph"><svg viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M8 31 21.5 7 36 31" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 25h18M22 14v23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="31" r="4" fill="#ECA678"/></svg></span><span><strong>ATLAS VIVO</strong><small>UCT20 · JBFS</small></span></a>
+      <div class="side-caption">ESTUDAR</div>
+      <nav class="side-menu">
+        <button data-page="inicio" class="nav-item selected"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3zM9 20v-6h6v6"/></svg></span> Visão geral</button>
+        <button data-page="capitulos" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v17H6a2 2 0 0 0-2 2zM4 5v17m4-14h8m-8 4h8m-8 4h5"/></svg></span> Capítulos ilustrados</button>
+        <button data-page="sps" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v16H4zm9 0h7v16h-7M7 8h1m8 0h1M7 12h1m8 0h1"/></svg></span> Módulos SP1–SP4</button>
+        <button data-page="atlas" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M5 19c4-1 5-4 7-7s3-6 7-7"/></svg></span> Atlas ilustrado</button>
+        <button data-page="3d" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zm0 10 9-5m-9 5L3 7m9 5v10"/></svg></span> Projetos 3D</button>
+        <button data-page="clinica" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 9h8m-8 4h5m-5 4h7M16 13l2 2 3-4"/></svg></span> Laboratório clínico</button>
+        <button data-page="prova" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/></svg></span> Modo prova</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="integration-dot"></span> <span>Craft · ⌕ tutoria</span>
+        <small>Notas originais e leitura integrada de tutoria</small>
+        <a id="side-craft" href="#" target="_blank" rel="noopener">Abrir central no Craft <span aria-hidden="true">↗</span></a>
+      </div>
+    </aside>
+
+    <div class="content-wrap">
+      <header class="topbar">
+        <div class="crumb"><span class="crumb-main">UCT20</span><span class="slash">/</span><span id="crumb-current">Visão geral</span></div>
+        <div class="top-actions"><span class="online-label"><i></i> Edição de estudo</span><button id="theme-toggle" class="icon-button" aria-label="Alternar tema">◐</button></div>
+      </header>
+
+      <div class="journey-dock" id="journey-dock" hidden aria-label="Etapa em andamento">
+        <div class="journey-dock-copy"><span class="journey-dock-kicker">SUA TRILHA DE ESTUDO</span><strong id="journey-dock-title">SP1 · Compreender</strong></div>
+        <div class="journey-dock-actions"><button type="button" id="journey-back">Ver percurso</button><button type="button" id="journey-finish">Concluir e avançar →</button></div>
+      </div>
+
+      <main id="main-content">
+        <section id="page-inicio" class="page active" aria-label="Visão geral">
+          <div class="hero">
+            <div class="hero-copy">
+              <div class="eyebrow"><span class="dot"></span> ORTOPEDIA · REUMATOLOGIA · SEMIOLOGIA</div>
+              <h1>O conhecimento<br>ganha <em>movimento.</em></h1>
+              <p>34 manobras, 35 estudos comentados e quatro SPs reconstruídos numa só narrativa visual — com 2D e 3D entrelaçados ao raciocínio clínico.</p>
+              <div class="hero-actions"><button class="primary-btn" data-goto="capitulos">Abrir capítulos <span>→</span></button><button class="secondary-btn" data-goto="atlas">Explorar manobras <span>→</span></button></div>
+            </div>
+            <div class="hero-graphic" aria-hidden="true"><div class="halo a"></div><div class="halo b"></div><svg viewBox="0 0 360 360" fill="none"><circle cx="180" cy="180" r="124" stroke="#81e2d7" stroke-opacity=".25"/><circle cx="180" cy="180" r="90" stroke="#81e2d7" stroke-opacity=".3" stroke-dasharray="5 10"/><path d="M161 56c-12 30-14 62-7 82l-4 29c-7 18-23 52-13 68 9 14 23 20 40 17l7-35 14-1 15 36c21 7 39-8 42-25 3-24-19-50-31-66l-4-25c7-27 6-50-5-81" stroke="#e7dfca" stroke-width="26" stroke-linecap="round"/><path d="m159 170 52 58m8-63-62 64" stroke="#eaa276" stroke-width="10" stroke-linecap="round"/><path d="M179 239v55m22-65 16 60" stroke="#8cd3c6" stroke-width="12" stroke-linecap="round"/><path d="M173 167c19 3 36 3 52-3" stroke="#fdf4df" stroke-width="9" stroke-linecap="round"/><circle cx="159" cy="170" r="7" fill="#f9b77e"/><circle cx="211" cy="227" r="7" fill="#f9b77e"/></svg><span class="anatomy-caption">MODELO ESQUEMÁTICO / JOELHO</span></div>
+          </div>
+
+          <section class="chapter-home" aria-label="Entrar nos capítulos ilustrados">
+            <div class="chapter-home-heading"><div><span class="chapter-kicker">LEITURA VISUAL · QUATRO CADERNOS</span><h2>Abra o capítulo.<br><em>Veja a medicina acontecer.</em></h2><p>Ilustrações próprias, classificações interativas, fluxogramas e decisões clínicas organizadas em seções.</p></div><button data-goto="capitulos" type="button">Ver biblioteca →</button></div>
+            <div class="chapter-home-grid"><button type="button" data-open-knowledge="sp1"><span>01 · SP1</span><b>Articulações</b><small>Sinóvia · tendão · triagem</small></button><button type="button" data-open-knowledge="sp2"><span>02 · SP2</span><b>Neuromuscular</b><small>Duchenne · diagnóstico</small></button><button type="button" data-open-knowledge="sp3"><span>03 · SP3</span><b>Trauma</b><small>Gustilo · consolidação</small></button><button type="button" data-open-knowledge="sp4"><span>04 · SP4</span><b>Oncologia</b><small>Imagem · biópsia</small></button></div>
+          </section>
+
+          <section class="journey-shell" id="guided-journey" aria-label="Trilha de aprendizagem guiada">
+            <div class="journey-heading"><div><span class="journey-eyebrow">TRILHA GUIADA · UCT20</span><h2>Seu próximo passo.</h2><p>Uma SP por vez, do conceito à recuperação ativa. Você escolhe o ritmo; o Atlas guarda onde parou neste aparelho.</p></div><div class="journey-progress-count" id="journey-count" aria-live="polite">0 de 5 etapas</div></div>
+            <div class="journey-switch" id="journey-switch" role="group" aria-label="Selecionar situação-problema"><button type="button" data-journey-sp="sp1">SP1</button><button type="button" data-journey-sp="sp2">SP2</button><button type="button" data-journey-sp="sp3">SP3</button><button type="button" data-journey-sp="sp4">SP4</button></div>
+            <div class="journey-meter" role="progressbar" aria-label="Progresso da SP selecionada" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" id="journey-meter"><span id="journey-meter-fill"></span></div>
+            <div class="journey-steps" id="journey-steps" aria-label="Etapas da trilha"></div>
+            <div class="journey-current"><div><span class="journey-current-kicker" id="journey-step-position">ETAPA 01 / 05</span><h3 id="journey-step-title">Compreender</h3><p id="journey-step-description"></p></div><div class="journey-current-actions"><button class="journey-open" id="journey-open" type="button">Abrir atividade →</button><button class="journey-complete" id="journey-complete" type="button">Marcar como concluída</button></div></div>
+            <div class="journey-recall" id="journey-recall" hidden><div><span class="journey-recall-dot" aria-hidden="true"></span><strong id="journey-recall-count">1 cartão para retomar</strong><span>Você marcou como difícil nesta SP.</span></div><button type="button" id="journey-recall-open">Revisar agora →</button></div>
+            <p class="journey-note">O progresso registra as etapas que você marcar; a revisão de questões continua independente e preservada.</p>
+          </section>
+
+          <button class="clinical-invite" type="button" data-goto="clinica"><span class="clinical-invite-mark">NOVO · LABORATÓRIO DE DECISÕES</span><span class="clinical-invite-heading">Você decide. O caso responde.</span><span class="clinical-invite-sub">Casos ramificados, vasoativos e radiologia: uma aprendizagem que reage às suas escolhas.</span><span class="clinical-invite-arrow" aria-hidden="true">Explorar →</span></button>
+
+          <div class="stats"><div><strong>34</strong><span>Manobras reconstruídas</span></div><div><strong>35</strong><span>Estudos comentados</span></div><div><strong>04</strong><span>Laboratórios cinéticos SP</span></div><div><strong>07</strong><span>Cenas 3D manipuláveis</span></div></div>
+
+          <div class="section-heading"><div><div class="kicker">ESCOLHA SEU PERCURSO</div><h2>Aprender por camadas</h2></div><span class="section-aside">Da observação ao domínio</span></div>
+          <div class="feature-grid">
+            <button class="feature-card green" data-goto="sps"><div class="feature-top"><span>01 / CONTEÚDO</span><span>↗</span></div><div class="feature-symbol"><svg viewBox="0 0 72 72" aria-hidden="true"><path d="M12 13h22v46H12zm26 0h22v46H38M19 24h8m-8 10h8m18-10h8m-8 10h8"/></svg></div><h3>As quatro SPs</h3><p>Teoria, animação em WebGL e notas de tutoria numa exposição contínua.</p><span class="feature-action">Explorar módulos →</span></button>
+            <button class="feature-card coral" data-goto="atlas"><div class="feature-top"><span>02 / VISUALIZAÇÃO</span><span>↗</span></div><div class="feature-symbol"><svg viewBox="0 0 72 72" aria-hidden="true"><path d="M17 55c6-19 14-13 19-31s12-15 19-7M10 36h52M36 10v52"/></svg></div><h3>Manobras em ação</h3><p>Sequências vetoriais com representação de força, movimento e interpretação.</p><span class="feature-action">Abrir atlas →</span></button>
+            <button class="feature-card blue" data-goto="3d"><div class="feature-top"><span>03 / ESPAÇO</span><span>↗</span></div><div class="feature-symbol"><svg viewBox="0 0 72 72" aria-hidden="true"><path d="m36 8 25 14v28L36 64 11 50V22zm0 28L61 22M36 36 11 22m25 14v28"/></svg></div><h3>Projetos 3D</h3><p>Gire, amplie, selecione estruturas e acompanhe o mecanismo ao longo do tempo.</p><span class="feature-action">Manipular cenas →</span></button>
+            <button class="feature-card gold" data-goto="prova"><div class="feature-top"><span>04 / EVOCAR</span><span>↗</span></div><div class="feature-symbol"><svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="27"/><path d="m24 36 8 8 17-18"/></svg></div><h3>Modo prova</h3><p>Recuperação ativa com respostas ocultas, justificativas e progresso local.</p><span class="feature-action">Começar revisão →</span></button>
+          </div>
+          <div class="notice compact"><span class="notice-icon">i</span><p><b>Uma única experiência.</b> Manobras, casos, capítulos ilustrados e cenas 3D são componentes próprios do aplicativo. Os documentos-fonte permanecem no acervo de trabalho e não são reproduzidos integralmente nas telas.</p></div>
+          <details class="install-guide"><summary><span class="install-glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M10 18h4M12 6v7m-3-3 3 3 3-3"/></svg></span><span><b>Instalar no iPhone</b><small>Adicione o Atlas Vivo à Tela de Início para abrir como aplicativo.</small></span><span class="install-caret">+</span></summary><div class="install-instructions"><p>Abra esta página no <b>Safari</b>, toque em <b>Compartilhar</b> e escolha <b>Adicionar à Tela de Início</b>. Confirme “Adicionar”. A instalação depende de uma ação sua no iOS; o Atlas mantém a leitura do Craft online.</p></div></details>
+        </section>
+
+        <section id="page-sps" class="page" aria-label="Módulos SP">
+          <div class="page-heading"><div class="kicker">TRILHA DE TUTORIA</div><h1>Quatro problemas.<br><em>Um mapa clínico.</em></h1><p>Leia a SP, explore suas estruturas tridimensionais e faça a conexão entre anatomia, mecanismo e raciocínio clínico. O painel Craft consulta as notas diretamente.</p></div>
+          <div class="knowledge-shortcut"><div><span>OUTRA FORMA DE APRENDER</span><strong>Os capítulos ilustrados agora têm uma biblioteca própria.</strong></div><button type="button" data-goto="capitulos">Abrir capítulos →</button></div>
+          <div id="sp-list" class="sp-grid"></div>
+          <div class="section-heading" id="theory-heading"><div><div class="kicker">EXPOSIÇÃO ANATÔMICA INTERATIVA</div><h2>Entenda o mecanismo em 3D</h2></div><span class="section-aside">Visual e teoria no mesmo percurso</span></div>
+          <div class="theory-module">
+            <div class="theory-nav" id="theory-nav"><button data-theory="sp1" class="active">SP1 · Articulações</button><button data-theory="sp2">SP2 · Fisiologia</button><button data-theory="sp3">SP3 · Trauma</button><button data-theory="sp4">SP4 · Tumores</button></div>
+            <div class="theory-body"><div class="theory-copy"><div class="kicker" id="theory-eyebrow">SP1 · ANATOMIA APLICADA</div><h3 id="theory-title"></h3><p id="theory-lead"></p><div class="theory-steps" id="theory-steps"></div><div class="theory-bottom"><button type="button" class="craft-btn" id="craft-read-now">Ler nota no painel ↓</button><a id="theory-craft" class="secondary-link" href="#">Abrir original no Craft ↗</a><span class="theory-caveat">Geometria esquemática, não peça anatômica validada</span></div></div><div class="theory-visual"><div class="theory-stage-head"><span id="theory-model-title">JOELHO · ESQUEMA 3D</span><button id="theory-reset" aria-label="Recentrar ilustração 3D">↺</button></div><canvas id="theory-canvas" aria-label="Modelo WebGL, toque uma estrutura, arraste para girar e use dois dedos para ampliar" tabindex="0"></canvas><div class="theory-stage-foot"><span>TOQUE PARA IDENTIFICAR · ARRASTE PARA GIRAR</span><button id="theory-highlight">Destacar estrutura →</button></div><div class="model-timeline"><button type="button" data-3d-play aria-pressed="false">Reproduzir</button><input data-3d-progress aria-label="Etapa da animação tridimensional" type="range" min="0" max="100" value="0"><output data-3d-phase>0%</output><span class="model-motion-caption" data-3d-caption>Joelho em repouso</span></div></div></div>
+          </div>
+          <section class="craft-reader" id="craft-reader" aria-label="Biblioteca de leitura integrada às notas do Craft"><div class="craft-reader-head"><div><div class="kicker">BIBLIOTECA AO VIVO · ⌕ TUTORIA</div><h2 id="craft-reader-title">Notas do Craft dentro do Atlas</h2><p id="craft-reader-description">Leia as SPs e os atlas complementares sem sair da exposição teórica. Selecione uma fonte abaixo.</p></div><div class="craft-reader-actions"><span id="craft-reader-state" role="status">Ainda não consultado</span><button type="button" id="craft-refresh">Atualizar nota</button></div></div><div class="craft-reader-layout"><div id="craft-reader-content" class="craft-reader-content"><p>Selecione uma SP e toque em “Ler nota no painel”.</p></div><aside class="craft-context" aria-label="Modelo 3D contextual"><div class="craft-context-title"><span class="kicker">ESPAÇO E MECANISMO</span><b id="craft-context-label">JOELHO · CONTEXTO</b></div><canvas id="craft-context-canvas" tabindex="0" aria-label="Modelo tridimensional manipulável da estrutura associada à nota; arraste para girar e toque para identificar"></canvas><div class="craft-context-terms" id="craft-context-terms" aria-label="Estruturas relacionáveis ao tema"></div><p id="craft-context-detail" role="status">Toque na estrutura para relacioná-la à explicação.</p><div class="craft-context-actions"><button type="button" id="craft-context-animate">Animar cena</button><button type="button" id="craft-context-focus">Ver teoria 3D ↑</button></div><p>Esquema didático manipulável. As notas originais são a fonte textual; a geometria é uma reconstrução interpretativa.</p></aside></div><form id="craft-annotation-form" class="craft-annotation"><label for="craft-annotation-text">Anotação vinculada à SP</label><p>O envio adiciona uma seção ao final da SP selecionada, preservando os blocos existentes. As notas complementares permanecem apenas para leitura.</p><textarea id="craft-annotation-text" maxlength="1200" rows="3" placeholder="Escreva uma observação de tutoria, hipótese ou dúvida para registrar nesta SP…" required></textarea><div class="craft-annotation-actions"><span id="craft-write-state" role="status">Edição sob demanda</span><button id="craft-save" type="submit">Adicionar à nota no Craft</button></div></form></section>
+          <section class="learning-section" aria-label="Exposições comentadas do módulo">
+            <div class="section-heading"><div><div class="kicker">CONHECIMENTO CONSOLIDADO</div><h2>Da dica ao mecanismo</h2></div><span class="section-aside">24 questões de fundamentos · conteúdo completo</span></div>
+            <div class="learning-shell"><div class="learning-toolbar"><div id="learning-tabs" class="learning-tabs"><button data-learning="sp1" class="active">SP1</button><button data-learning="sp2">SP2</button><button data-learning="sp3">SP3</button><button data-learning="sp4">SP4</button></div><span id="learning-count">8 explicações</span></div><div id="learning-figure" class="learning-figure"></div><div id="learning-list" class="learning-list"></div></div>
+          </section>
+          <div class="section-heading"><div><div class="kicker">LEITURA INTEGRADORA</div><h2>Recursos do acervo</h2></div><label class="resource-search"><span>Filtrar notas</span><input id="resource-search" type="search" placeholder="Cristais, casos, semiologia…" autocomplete="off"></label></div>
+          <div id="craft-resources" class="resource-list"></div>
+          <div class="notice"><span class="notice-icon">i</span><p><b>Proveniência.</b> O painel busca a nota diretamente na conexão Craft configurada no servidor. Os conteúdos editoriais e 3D continuam identificados como reconstruções didáticas, sujeitos a revisão científica.</p></div>
+        </section>
+
+        <section id="page-capitulos" class="page" aria-label="Capítulos médicos ilustrados">
+          <header class="chapter-cover"><span class="chapter-cover-eyebrow">ATLAS VIVO · BIBLIOTECA VISUAL</span><h1>Medicina em<br><em>seções vivas.</em></h1><p>Aprenda por quadros ilustrados, processos em etapas, comparações e situações de decisão. Cada capítulo foi desenhado para o celular, com leitura contínua e figuras integradas.</p><div class="chapter-cover-metrics"><span><b>04</b> capítulos</span><span><b>SP1–SP4</b> conectadas</span><span><b>01</b> percurso</span></div></header>
+          <div class="chapter-path" aria-label="Sequência sugerida de estudo"><span>01 · Observe</span><i aria-hidden="true">→</i><span>02 · Entenda</span><i aria-hidden="true">→</i><span>03 · Decida</span><i aria-hidden="true">→</i><span>04 · Revise</span></div>
+          <div class="chapter-catalog-heading"><div class="kicker">ESCOLHA UM CADERNO</div><h2>Seu ponto de partida</h2><p>Toque em um tema para abrir os painéis logo abaixo. O capítulo escolhido permanece em destaque.</p></div>
+          <div class="chapter-catalog" aria-label="Biblioteca de capítulos">
+            <button type="button" data-open-knowledge="sp1" class="chapter-tile"><span class="chapter-tile-top"><i>01 / SP1</i><span aria-hidden="true">↗</span></span><span class="chapter-tile-icon" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none"><path d="M32 9v23q0 9-8 14-9 7-7 15 3 10 23 10t23-10q2-8-7-15-8-5-8-14V9"/><path d="M22 48q18 14 36 0M22 59q18-10 36 0"/></svg></span><b>Articulações e tendões</b><small>Sinóvia, colágeno e sinais de alerta</small><em>Explorar ilustrações →</em></button>
+            <button type="button" data-open-knowledge="sp2" class="chapter-tile"><span class="chapter-tile-top"><i>02 / SP2</i><span aria-hidden="true">↗</span></span><span class="chapter-tile-icon" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none"><path d="M13 28q12-14 27 0t27 0M13 52q12-14 27 0t27 0"/><path d="M20 23v34m9-32v30m11-28v26m11-28v30m9-32v34"/></svg></span><b>Neuromuscular</b><small>Distrofina, Duchenne e fluxo diagnóstico</small><em>Seguir o mecanismo →</em></button>
+            <button type="button" data-open-knowledge="sp3" class="chapter-tile"><span class="chapter-tile-top"><i>03 / SP3</i><span aria-hidden="true">↗</span></span><span class="chapter-tile-icon" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none"><path d="M12 29h22l9 11-9 11H12zm56 0H46l-9 11 9 11h22"/><path d="m33 35 12 11m1-12-12 12"/></svg></span><b>Trauma e reparo</b><small>Gustilo, estabilização e quatro fases ósseas</small><em>Comparar classificações →</em></button>
+            <button type="button" data-open-knowledge="sp4" class="chapter-tile"><span class="chapter-tile-top"><i>04 / SP4</i><span aria-hidden="true">↗</span></span><span class="chapter-tile-icon" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none"><path d="M32 12v56m16-56v56M32 24h16M32 56h16"/><circle cx="40" cy="40" r="18"/><path d="M58 58l13 13"/></svg></span><b>Oncologia óssea</b><small>Imagem, agressividade e biópsia planejada</small><em>Interpretar achados →</em></button>
+          </div>
+          <section class="knowledge-chapters" id="knowledge-chapters" aria-label="Painéis médicos ilustrados">
+            <div class="section-heading"><div><div class="kicker">CAPÍTULOS VISUAIS · EDIÇÃO CLÍNICA</div><h2>O estudo em painéis.</h2></div><span class="section-aside">Fluxos · classificações · fisiopatologia</span></div>
+            <p class="knowledge-lead">Cada módulo tem um painel próprio, com ilustrações de mecanismo, hierarquia de evidências e pontos de segurança. Toque nas etapas para aprofundar.</p>
+            <div class="knowledge-tabs" role="tablist" aria-label="Escolher capítulo"><button type="button" data-knowledge="sp1" aria-selected="true">SP1 · Estruturas</button><button type="button" data-knowledge="sp2" aria-selected="false">SP2 · Neuromuscular</button><button type="button" data-knowledge="sp3" aria-selected="false">SP3 · Trauma</button><button type="button" data-knowledge="sp4" aria-selected="false">SP4 · Oncologia</button></div>
+            <div id="knowledge-content" class="knowledge-content" aria-live="polite"></div>
+          </section>
+          <div class="chapter-end"><div><span>CONTINUE A TRILHA</span><h3>Da figura ao raciocínio.</h3><p>Prossiga para a SP original e a anatomia 3D, pratique decisões clínicas e finalize com recuperação ativa.</p></div><div class="chapter-end-actions"><button type="button" data-goto="sps">SP e modelo 3D →</button><button type="button" data-goto="clinica">Aplicar em casos →</button><button type="button" data-goto="prova">Ir para questões →</button></div></div>
+        </section>
+
+        <section id="page-atlas" class="page" aria-label="Atlas ilustrado">
+          <div class="page-heading tight"><div class="kicker">ATLAS RECONSTRUÍDO · SEM QUADROS EXTERNOS</div><h1>34 manobras.<br><em>Um só atlas.</em></h1><p>Procure a estrutura, observe o movimento, execute mentalmente a técnica e interprete o achado. Cada cena vetorial é um componente nativo desta edição.</p></div>
+          <div class="maneuver-toolbar"><label class="maneuver-search"><span>⌕</span><input id="maneuver-search" type="search" placeholder="Buscar manobra, ligamento, músculo..." autocomplete="off" aria-label="Buscar manobras"></label><button id="pause-maneuvers" class="model-reset" aria-pressed="false">Pausar movimento Ⅱ</button></div>
+          <div id="maneuver-filters" class="maneuver-filters" aria-label="Filtrar por região"></div>
+          <div class="maneuver-summary"><span id="maneuver-count">34 manobras</span><span>ANIMAÇÃO ESQUEMÁTICA · TESTES NÃO CONFIRMAM DIAGNÓSTICO ISOLADAMENTE</span></div>
+          <section id="maneuver-three-d" class="maneuver-3d-panel" hidden aria-label="Visualização 3D contextual"><div class="maneuver-3d-copy"><div class="kicker">ANATOMIA EM CONTEXTO</div><h2 id="maneuver-3d-heading">Relações espaciais</h2><p>Compare os trajetos anatômicos com a técnica ilustrada. Esta maquete não representa um paciente real.</p><button id="close-maneuver-3d" class="model-reset">Fechar visualização ×</button></div><canvas id="maneuver-canvas" tabindex="0" aria-label="Modelo espacial relacionado à manobra selecionada"></canvas></section>
+          <div id="maneuver-list" class="maneuver-grid"></div>
+          <div class="notice"><span class="notice-icon">!</span><p><b>Revisão clínica:</b> a execução exige interpretação contextual e comparação contralateral. As ilustrações são esquemáticas, não tutoriais procedimentais certificados. Para ir do teste à fisiopatologia, use “Explorar 3D” dentro do próprio cartão.</p></div>
+          <details class="science-details"><summary>Proveniência e atualização científica <span>+</span></summary><div><p>O conteúdo das três edições de manobras e das três edições SP1–SP4 foi consolidado por tema. Os seis documentos-fonte são mantidos no arquivo de desenvolvimento, fora do aplicativo distribuído. As notas completas e editáveis permanecem no <a href="craftdocs://open?spaceId=8b335448-6499-3d04-91c1-5f99c399aca8&amp;blockId=7600209f-ac0e-25cc-79b4-71e9b211b32d">Craft · ⌕ tutoria ↗</a>.</p><p><b>Artrite séptica pediátrica:</b> critérios de Kocher foram desenvolvidos para quadril e não devem ser extrapolados diretamente para joelho. <a href="https://www.idsociety.org/practice-guideline/acute-bacterial-arthritis-in-pediatrics2/" target="_blank" rel="noopener">PIDS/IDSA 2023 ↗</a></p><p><b>Gonococemia:</b> tratamento CDC para artrite/dermatite inclui ceftriaxona e doxiciclina para clamídia se não excluída; a fonte histórica cita azitromicina de rotina. <a href="https://www.cdc.gov/std/treatment-guidelines/gonorrhea-adults.htm" target="_blank" rel="noopener">CDC ↗</a></p><p>Figuras 03, 09, 12 e 15 no Craft seguem pendentes de homologação.</p></div></details>
+        </section>
+
+        <section id="page-3d" class="page" aria-label="Laboratório 3D">
+          <div class="page-heading tight"><div class="kicker">EXPLORAÇÃO LIVRE · EXTENSÃO DAS SPS</div><h1>Veja por <em>outro ângulo.</em></h1><p>Sete projetos 3D integram os temas das SPs, incluindo uma cena original de osteomielite crônica. Gire, selecione estruturas, controle o movimento e exporte. São modelos esquemáticos, não peças anatômicas certificadas.</p></div>
+          <div class="lab-layout">
+            <div class="lab-main">
+              <div class="lab-toolbar">
+                <div id="model-pills" class="pill-group">
+                  <button class="active" data-model="joelho">Joelho</button>
+                  <button data-model="ombro">Ombro</button>
+                  <button data-model="tornozelo">Tornozelo</button>
+                  <button data-model="sarcomero">Sarcômero</button>
+                  <button data-model="fratura">Fratura</button>
+                  <button data-model="osteomielite">Osteomielite</button>
+                  <button data-model="tumor">Tumor</button>
+                </div>
+                <button id="reset-view" class="model-reset">Recentrar ↺</button>
+              </div>
+              <div class="model-canvas-wrap">
+                <canvas id="model-canvas" aria-label="Modelo WebGL, toque uma estrutura para identificá-la, arraste para girar e use dois dedos para ampliar" tabindex="0"></canvas>
+                <div class="canvas-help">TOQUE PARA IDENTIFICAR <span>·</span> PINÇA PARA ZOOM</div>
+                <div class="model-coordinate">X · Y · Z <span>WEBGL · PROFUNDIDADE REAL</span></div>
+              </div>
+              <div class="model-timeline lab-timeline">
+                <button type="button" data-3d-play aria-pressed="false">Reproduzir</button>
+                <input data-3d-progress aria-label="Etapa da animação tridimensional" type="range" min="0" max="100" value="0">
+                <output data-3d-phase>0%</output>
+                <span class="model-motion-caption" data-3d-caption>Joelho em repouso</span>
+              </div>
+              <div class="lab-footer">
+                <label class="switch-row"><input type="checkbox" id="bones-toggle" checked><span>Estruturas principais</span></label>
+                <label class="switch-row"><input type="checkbox" id="ligaments-toggle" checked><span>Estruturas associadas</span></label>
+                <label class="switch-row"><input type="checkbox" id="auto-rotate"><span>Rotação</span></label>
+                <button class="model-reset" id="export-model">Exportar projeto .OBJ ↓</button>
+              </div>
+            </div>
+            <aside class="lab-panel">
+              <div class="lab-panel-top"><span class="kicker">EXPLORADOR DE ESTRUTURAS</span><h2 id="model-title">Joelho</h2><p id="model-intro"></p></div>
+              <div id="structure-list" class="structure-list"></div>
+              <div class="anatomy-warning"><b>Representação didática</b><p>Geometria simplificada, fora de escala, sem homologação anatômica. Selecione estruturas para destacar relações gerais, não para medidas ou planejamento clínico.</p></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="page-clinica" class="page" aria-label="Laboratório de decisões clínicas">
+          <div class="clinical-head"><div class="kicker">ATLAS VIVO · RACIOCÍNIO EM MOVIMENTO</div><h1>Aprenda fazendo <em>escolhas.</em></h1><p>Um espaço para experimentar hipóteses, reconhecer sinais de perigo e justificar condutas. As decisões são exercícios didáticos; situações reais exigem avaliação e supervisão clínica.</p></div>
+          <div class="clinical-tabs" role="tablist" aria-label="Áreas do laboratório clínico"><button type="button" role="tab" aria-selected="true" data-clinic-tab="casos"><span class="clinical-tab-number">01</span> Decisões</button><button type="button" role="tab" aria-selected="false" data-clinic-tab="farmacos"><span class="clinical-tab-number">02</span> Vasoativos</button><button type="button" role="tab" aria-selected="false" data-clinic-tab="imagem"><span class="clinical-tab-number">03</span> Radiologia</button></div>
+          <div id="clinical-cases" class="clinical-view" role="tabpanel" aria-label="Casos clínicos"></div>
+          <div id="clinical-pharma" class="clinical-view" role="tabpanel" aria-label="Farmacologia da emergência" hidden></div>
+          <div id="clinical-imaging" class="clinical-view" role="tabpanel" aria-label="Padrões radiológicos" hidden></div>
+          <div class="clinical-source-note"><span>REVISÃO CIENTÍFICA</span><p>Fontes originais consolidadas com referências primárias. Classificações, mecanismos e cenários são simplificações para ensino e não substituem protocolos locais, bula ou diretriz vigente.</p></div>
+        </section>
+
+        <section id="page-prova" class="page" aria-label="Modo prova">
+          <div class="page-heading tight"><div class="kicker">RECUPERAÇÃO ATIVA</div><h1>Responder antes<br>de <em>revelar.</em></h1><p>Manobras e raciocínio clínico em cartões curtos. Sua sequência fica salva neste dispositivo.</p></div>
+          <div class="quiz-toolbar">
+            <label class="quiz-filter"><span class="quiz-small">FILTRO DA SESSÃO</span><select id="quiz-topic"><option value="todos">Todos os temas</option><option value="semiologia">Semiologia</option><option value="SP1">SP1 · Reumatologia</option><option value="SP2">SP2 · Neuromuscular</option><option value="SP3">SP3 · Trauma</option><option value="SP4">SP4 · Onco-ortopedia</option></select></label>
+            <div class="quiz-controls"><div class="quiz-score"><b id="quiz-reviewed">0</b><span>de <span id="quiz-total">20</span> revisados</span></div><button type="button" id="quiz-weak-toggle" class="quiz-weak-toggle" aria-pressed="false"><span class="quiz-weak-dot" aria-hidden="true"></span><span id="quiz-weak-label">Rever dificuldades</span><b id="quiz-weak-count">0</b></button></div>
+          </div>
+          <p id="quiz-feedback" class="quiz-feedback" role="status" aria-live="polite">Responda antes de revelar. Classifique sua lembrança para montar uma fila de revisão focada.</p>
+          <div class="quiz-card"><div class="quiz-card-head"><span id="quiz-tag">SEMIOLÓGICA</span><span id="quiz-count">1 / 20</span></div><div class="quiz-prompt" id="quiz-prompt"></div><div class="quiz-answer" id="quiz-answer" hidden><div class="answer-caption">RESPOSTA COMENTADA</div><h3 id="quiz-solution"></h3><p id="quiz-explain"></p><div id="quiz-source"></div></div><button class="reveal-btn" id="quiz-reveal">Revelar resposta <span>↓</span></button></div>
+          <div class="rating-actions" id="rating-actions" hidden><button data-grade="rever">Rever</button><button data-grade="acertei">Acertei</button><button data-grade="dominei">Dominei</button></div>
+          <div class="quiz-bottom"><button id="quiz-prev" class="text-button">← Anterior</button><button id="quiz-next" class="text-button">Próximo →</button></div>
+          <div class="section-heading"><div><div class="kicker">11 VINHETAS CLÍNICAS DA FONTE</div><h2>Casos que cruzam as SPs</h2></div><span class="section-aside">Hipótese → discriminador → conduta</span></div>
+          <div id="cases-list" class="cases-list"></div>
+        </section>
+      </main>
+
+      <footer class="app-footer"><span>ATLAS VIVO · UCT20</span><span>Conteúdo para estudo supervisionado · Criado por JBFS</span></footer>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Navegação rápida"><button data-page="inicio" class="selected"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3zM9 20v-6h6v6"/></svg>Início</button><button data-page="capitulos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v17H6a2 2 0 0 0-2 2zM4 5v17m4-14h8m-8 4h8"/></svg>Capítulos</button><button data-page="atlas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M5 19c4-1 5-4 7-7s3-6 7-7"/></svg>Atlas</button><button data-page="clinica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 9h8m-8 4h5m-5 4h7"/></svg>Casos</button><button data-page="prova"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/></svg>Prova</button></nav>
+  <script src="/unified-data.js" defer></script>
+  <script src="/maneuver-engine.js" defer></script>
+  <script src="/model3d.js" defer></script>
+  <script src="/webgl3d.js" defer></script>
+  <script src="/mechanism-workbench.js" defer></script>
+  <script src="/clinical-lab.js" defer></script>
+  <script src="/knowledge-panels.js" defer></script>
+  <script src="/app.js" defer></script>
+  <script src="/craft-sync.js" defer></script>
+</body>
+</html>
