@@ -98,7 +98,9 @@ export function planAdminUpdate(controlResponse,request,catalogResponse,controlR
 export function safeOrigin(req){
  const origin=req.headers?.origin;if(!origin)return true;
  try{
-   const u=new URL(origin),host=String(req.headers?.['x-forwarded-host']||req.headers?.host||'');
-   return u.protocol==='https:'&&u.host===host;
+   const u=new URL(origin),hosts=new Set([req.headers?.host,req.headers?.['x-forwarded-host']].filter(Boolean).map(String));
+   const loopback=/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(u.host);
+   return hosts.has(u.host)&&(u.protocol==='https:'||(loopback&&u.protocol==='http:'));
+
  }catch{return false}
 }
