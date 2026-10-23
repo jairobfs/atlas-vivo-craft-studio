@@ -1,5 +1,5 @@
 import {kind,raw} from './visual-core.js';
-export const BOARD_W=1100,BOARD_H=735;
+export const BOARD_W=1100,BOARD_H=619;
 export const clamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,Number.isFinite(Number(n))?Number(n):lo));
 const within=(n,min,max)=>Math.round(clamp(n,min,max));
 export function keyOf(section){return String(section?.source||section?.key||'')}
