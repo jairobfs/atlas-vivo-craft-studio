@@ -77,3 +77,7 @@
 @media(max-width:1030px){.compose-root{grid-template-columns:1fr}.compose-header{grid-column:1}.compose-inspector{position:relative;top:auto;max-height:none}.compose-inspector .compose-library{max-height:180px}.compose-header h1{font-size:30px}}
 @media(max-width:720px){.compose-root{gap:10px}.compose-header{gap:7px}.compose-header h1{font-size:27px}.compose-tools{gap:5px;padding:10px}.compose-inspector{padding:14px}.compose-chips{gap:5px}.compose-chips .btn{font-size:11px;padding:7px 9px}.compose-scroll{padding:6px}}
 @media print{.compose-header,.compose-inspector,.compose-tools,.compose-guide,.compose-bottomnote{display:none!important}.compose-root{display:block}.compose-scroll{border:0;padding:0;background:white}.compose-viewport{width:1100px!important;height:619px!important}.compose-board{transform:none!important;position:relative!important;width:1100px!important;height:619px!important;break-after:page}.compose-block{box-shadow:none}.compose-resize{display:none}}
+
+.composer-fullscreen{position:fixed;inset:0;z-index:100;background:var(--bg);overflow:auto;padding:25px 30px 80px;overscroll-behavior:contain}
+.composer-fullscreen .compose-root{max-width:1500px;margin:auto}
+@media(max-width:720px){.composer-fullscreen{padding:15px 12px 80px}}
