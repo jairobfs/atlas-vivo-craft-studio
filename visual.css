@@ -27,3 +27,15 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:var(--ink)
 @media(max-width:600px){.presentation-stage>.prancha{min-height:390px;aspect-ratio:auto;max-height:70dvh;overflow:auto}.presentation-controls{gap:9px}.concept-leaves{grid-template-columns:1fr}.concept-web{padding:16px 0}.map-hub{padding:19px}.map-leaf{padding:14px}.cards{grid-template-columns:1fr 1fr}}
 @media(max-width:380px){.cards{grid-template-columns:1fr}}
 @media print{.presentation-controls{display:none}.presentation-stage>.prancha{min-height:auto;aspect-ratio:auto;overflow:visible;break-after:page}.concept-web:before,.map-leaf:before{display:none}}
+
+
+/* Faltas iconográficas: nunca substituir marcadores por imagens falsas. */
+.audit-figure{border-color:var(--amber)!important;color:var(--amber)!important;background:transparent!important}
+.figure-audit-modal{position:fixed;inset:0;z-index:90;background:#041721dc;display:grid;place-items:center;padding:20px}
+.audit-panel{width:min(800px,100%);max-height:90dvh;overflow:auto;border:1px solid var(--line);border-radius:20px;background:var(--surface);padding:24px;box-shadow:0 30px 90px #0005}
+.audit-panel h2{margin:6px 0}
+.audit-list{display:grid;gap:8px;margin:19px 0}
+.audit-row{display:flex;align-items:center;gap:14px;justify-content:space-between;padding:15px;border:1px solid var(--line);border-radius:12px;background:var(--surface2)}
+.audit-row strong{font-size:11px;color:var(--amber)}
+.audit-row>span:nth-child(2){flex:1;overflow-wrap:anywhere}
+@media(max-width:550px){.figure-audit-modal{padding:10px}.audit-panel{padding:16px}.audit-row{align-items:flex-start;flex-wrap:wrap}.audit-row .chip{margin-left:auto}}
