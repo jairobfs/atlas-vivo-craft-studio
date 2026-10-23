@@ -591,3 +591,31 @@ main{padding-top:40px}.kicker,.eyebrow{font-size:12px;line-height:1.5}
   .quiz-controls{grid-template-columns:1fr}.quiz-score{justify-content:center}.quiz-weak-toggle{font-size:13px}
   .quiz-card{padding:22px 19px}.quiz-prompt{font-size:25px}
 }
+
+/* V19 · touch-first navigation: expose interactive 3D directly on iPhone */
+@media(max-width:850px){
+ .mobile-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;align-items:stretch;padding:5px max(7px,env(safe-area-inset-right,0px)) calc(7px + env(safe-area-inset-bottom,0px)) max(7px,env(safe-area-inset-left,0px));background:var(--paper);border-top:1px solid var(--line);box-shadow:0 -12px 28px #081e2920;z-index:30}
+ .mobile-nav button{position:relative;width:100%;min-width:0;min-height:57px;padding:8px 2px 6px;border:0;border-radius:13px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;font-size:11px;line-height:1.1;font-weight:800;letter-spacing:0;background:transparent;color:var(--muted);-webkit-tap-highlight-color:transparent}
+ .mobile-nav button.selected{background:var(--pale);color:var(--teal)}
+ .mobile-nav button.selected:before{content:"";position:absolute;top:3px;left:26%;right:26%;height:3px;background:var(--teal);border-radius:0 0 5px 5px}
+ .mobile-nav svg{width:23px;height:23px;flex:0 0 23px;margin:0}
+ .mobile-nav button:focus-visible{outline:3px solid var(--teal);outline-offset:-2px}
+ .app-footer{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+ main{padding-bottom:calc(125px + env(safe-area-inset-bottom,0px))}
+}
+@media(max-width:355px){.mobile-nav button{font-size:10px;min-height:56px;gap:3px}.mobile-nav svg{width:22px;height:22px;flex-basis:22px}}
+.progress-vault{margin-top:16px;padding:22px;border:1px solid var(--line);border-radius:17px;background:var(--paper);box-shadow:var(--shadow)}
+.progress-vault-head{display:flex;align-items:flex-start;gap:17px}
+.progress-vault-mark{flex:0 0 48px;width:48px;height:48px;display:grid;place-items:center;background:var(--pale);border-radius:14px;color:var(--teal)}
+.progress-vault-mark svg,.progress-vault-actions svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.progress-vault-head h2{font:650 clamp(25px,4vw,32px)/1.17 Fraunces,Georgia,serif;margin:6px 0 8px;color:var(--ink)}
+.progress-vault-head p{font-size:14px;color:var(--muted);line-height:1.55;margin:0}
+.progress-vault-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 12px}
+.progress-vault-actions button{flex:1 1 180px;display:inline-flex;justify-content:center;align-items:center;gap:10px;min-height:52px;border-radius:12px;border:1px solid var(--teal);background:var(--paper);color:var(--teal);font:800 14px/1.25 'DM Sans',sans-serif;padding:12px 15px;cursor:pointer}
+.progress-vault-actions button:first-child{background:var(--teal);color:#fff}
+.progress-vault-actions svg{width:20px;height:20px;flex:none}
+.progress-vault-note{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+.progress-vault-feedback{font-size:13px;margin:7px 0 0;color:var(--teal);font-weight:700}
+.progress-vault-feedback:empty{display:none}
+@media(max-width:600px){.progress-vault{padding:18px 16px}.progress-vault-head{gap:11px}.progress-vault-mark{width:42px;height:42px;flex-basis:42px}.progress-vault-head h2{font-size:27px}.progress-vault-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.progress-vault-actions button{min-width:0;min-height:53px;padding:10px 8px;font-size:12px;gap:6px}.progress-vault-actions svg{width:18px;height:18px}}
+@media(max-width:345px){.progress-vault-actions{grid-template-columns:1fr}.progress-vault-actions button{font-size:14px}}
