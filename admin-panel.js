@@ -119,7 +119,7 @@ export async function renderAdminConsole({host,api,settings,onSaved,onExit,onCre
  async function reload(){
   if((settingsDirty||libraryDirty||password)&&!confirm('Descartar alterações não salvas e carregar o Craft?'))return;
   try{
-   const [c,d]=await Promise.all([api('control'),api('catalog')]);
+   const [c,d]=await Promise.all([api('control',{refresh:'1'}),api('catalog')]);
    cfg=c;draft={...c};catalog=Array.isArray(d?.items)?d.items:[];selectedIds=(cfg.visibleNotes||[]).map(s=>catalogId(s,catalog)).filter(Boolean);unresolved=(cfg.visibleNotes||[]).filter(s=>!catalogId(s,catalog));
    settingsDirty=false;libraryDirty=false;password='';notice='Configurações recarregadas diretamente do Craft.';render();
    await onSaved?.(cfg);
