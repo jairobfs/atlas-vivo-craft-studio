@@ -234,7 +234,7 @@ async function sync(){
  if(S.loading)return;
  S.loading=true;
  try{
-   const [d,conn,control]=await Promise.allSettled([API('documents'),API('connection'),API('control')]);
+   const [d,conn,control]=await Promise.allSettled([API('documents'),API('connection'),API('control',{refresh:'1'})]);
    if(d.status!=='fulfilled')throw d.reason;
    S.docs=list(d.value);
    if(conn.status==='fulfilled')S.connection=conn.value;
