@@ -1,6 +1,7 @@
 import {esc,safe,list,flat,title,id,raw,rich,image,level,kind,compile,clean,steps,sides,rows,demo} from './visual-core.js';
+import {openVisualComposer,orderedVisualSections} from './visual-composer.js';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'atlas',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false};
+let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'atlas',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false,layoutConfig:null,composer:null};
 const menu=[['home','Painel'],['library','Biblioteca'],['atlas','Atlas visual'],['studio','Estúdio']];
 async function API(op,args={},data){
  const u=new URL('/api/craft',location.href);u.searchParams.set('op',op);
@@ -18,7 +19,7 @@ function landing(){
  $('#screen').innerHTML='<div class="hero"><div class="eyebrow">ATLAS VIVO · COLORHUB × UNIVERSO</div><h1>O Craft edita.<br>O atlas interpreta.</h1><p>Pranchas científicas, comparações, imagens reais, diagramas e recuperação ativa. Sem substituir suas notas por uma cópia estática.</p><div class="actions"><button class="btn primary" id="browse">Abrir biblioteca →</button><button class="btn" id="example">Explorar exemplo visual</button><button class="btn" id="sync">Sincronizar Craft</button></div></div>'+
  '<div class="stats"><div class="panel"><div class="eyebrow">BIBLIOTECA CRAFT</div><div class="stat-value">'+S.docs.length+'</div><div class="muted mini">Notas consultáveis no seu espaço</div></div><div class="panel"><div class="eyebrow">PONTOS DE EDIÇÃO</div><div class="stat-value">2 vias</div><div class="muted mini">Craft ↔ interface visual</div></div></div><div class="section-top"><h2>Notas recentes</h2><button class="btn small" id="more">Ver todas</button></div>'+
  '<div class="grid">'+cards.map(documentCard).join('')+'</div>';
- $('#browse').onclick=$('#more').onclick=()=>navigate('library');$('#example').onclick=()=>{S.doc=demo();S.project=compile(S.doc);S.demo=true;S.docId='';navigate('atlas')};$('#sync').onclick=sync;bindCards();
+ $('#browse').onclick=$('#more').onclick=()=>navigate('library');$('#example').onclick=()=>{S.doc=demo();S.project=compile(S.doc);S.demo=true;S.layoutConfig=null;S.docId='';navigate('atlas')};$('#sync').onclick=sync;bindCards();
 }
 function library(){
  let docs=S.docs.filter(d=>title(d).toLowerCase().includes(S.filter.toLowerCase()));
@@ -69,21 +70,40 @@ function groupRender(section,idx){
   if(v[i].kind==='image'){let images=[];while(i<v.length&&v[i].kind==='image')images.push(v[i++]);html+='<div class="figure-grid">'+images.map(textItem).join('')+'</div>';continue}
   html+=textItem(v[i]);i++;
  }
- return '<section class="prancha" id="'+esc(section.key)+'"><div class="prancha-head"><span class="eyebrow">PRANCHA '+String(idx+1).padStart(2,'0')+' · '+(idx===0?'ABERTURA':'EVIDÊNCIA E MECANISMO')+'</span><span class="chip">'+v.length+' componentes</span></div><h2>'+rich(section.name)+'</h2>'+html+'</section>';
+ return '<section class="prancha '+(section.display==='half'?'section-half':section.display==='feature'?'section-feature':'')+'" id="'+esc(section.key)+'"><div class="prancha-head"><span class="eyebrow">PRANCHA '+String(idx+1).padStart(2,'0')+' · '+(idx===0?'ABERTURA':'EVIDÊNCIA E MECANISMO')+'</span><span class="chip">'+v.length+' componentes</span></div><h2>'+rich(section.name)+'</h2>'+html+'</section>';
 }
 function atlas(){
  if(!S.project){$('#screen').innerHTML='<div class="empty">Selecione um documento para construir o atlas.</div>';return}
- const v=S.project,demoFlag=S.demo;
+ const v={...S.project,sections:orderedVisualSections(S.project,S.layoutConfig)},demoFlag=S.demo;
  const u=craftURL();
- $('#screen').innerHTML='<div class="article"><div class="article-head"><div class="eyebrow">ATLAS VISUAL · COLORHUB × UNIVERSO</div><h1>'+esc(v.title)+'</h1><p class="outline-label">'+(demoFlag?'Exemplo autoral de apresentação. Abra uma nota para renderizar conteúdo verdadeiro.':'Composição editorial estruturada a partir dos blocos originais do Craft.')+'</p><div class="bar"><div class="pillset"><span class="chip">'+v.sections.length+' pranchas</span><span class="chip">'+v.figures+' imagens</span><span class="chip">'+v.tables+' tabelas</span></div><div class="actions"><button class="btn small" id="refresh">Atualizar</button>'+(!demoFlag&&u?'<a class="btn small primary" href="'+esc(u)+'">Editar no Craft ↗</a>':'')+'</div></div><div class="actions" style="margin-top:13px"><button class="btn small '+(S.mode==='atlas'?'active':'')+'" id="atlas-mode">Pranchas editoriais</button><button class="btn small '+(S.mode==='map'?'active':'')+'" id="map-mode">Mapa mental</button><button class="btn small '+(S.mode==='presentation'?'active':'')+'" id="presentation-mode">Apresentar 16:9</button><button class="btn small" id="visual-edit">Editor visual</button><button class="btn small" id="print">Exportar PDF</button></div></div>'+
- (S.mode==='map'?renderMap(v):S.mode==='presentation'?renderPresentation(v):'<div class="article-toc">'+v.sections.map(s=>'<a href="#'+esc(s.key)+'">'+esc(s.name)+'</a>').join('')+'</div><div class="atlas-stack">'+v.sections.map(groupRender).join('')+'</div>')+
+ $('#screen').innerHTML='<div class="article"><div class="article-head"><div class="eyebrow">ATLAS VISUAL · COLORHUB × UNIVERSO</div><h1>'+esc(v.title)+'</h1><p class="outline-label">'+(demoFlag?'Exemplo autoral de apresentação. Abra uma nota para renderizar conteúdo verdadeiro.':'Composição editorial estruturada a partir dos blocos originais do Craft.')+'</p><div class="bar"><div class="pillset"><span class="chip">'+v.sections.length+' pranchas</span><span class="chip">'+v.figures+' imagens</span><span class="chip">'+v.tables+' tabelas</span></div><div class="actions"><button class="btn small" id="refresh">Atualizar</button>'+(!demoFlag&&u?'<a class="btn small primary" href="'+esc(u)+'">Editar no Craft ↗</a>':'')+'</div></div><div class="actions" style="margin-top:13px"><button class="btn small '+(S.mode==='atlas'?'active':'')+'" id="atlas-mode">Pranchas editoriais</button><button class="btn small '+(S.mode==='map'?'active':'')+'" id="map-mode">Mapa mental</button><button class="btn small '+(S.mode==='presentation'?'active':'')+'" id="presentation-mode">Apresentar 16:9</button><button class="btn small primary" id="composer-open">Compor visualmente</button><button class="btn small" id="visual-edit">Editar textos</button><button class="btn small" id="print">Exportar PDF</button></div></div>'+
+ (S.mode==='map'?renderMap(v):S.mode==='presentation'?renderPresentation(v):'<div class="article-toc">'+v.sections.map(s=>'<a href="#'+esc(s.key)+'">'+esc(s.name)+'</a>').join('')+'</div><div class="atlas-stack layout-'+esc(S.layoutConfig?.layout||'editorial')+' density-'+esc(S.layoutConfig?.density||'balanced')+'">'+v.sections.map(groupRender).join('')+'</div>')+
  '<div class="footer-note">Origem: Craft. Figuras originais preservadas. Este renderizador não substitui revisão científica das fontes.</div></div>';
  $('#refresh').onclick=()=>{if(S.demo){S.project=compile(demo());atlas()}else openDoc(S.docId)};
  $('#atlas-mode').onclick=()=>{S.mode='atlas';atlas()};$('#map-mode').onclick=()=>{S.mode='map';atlas()};$('#presentation-mode').onclick=()=>{S.mode='presentation';S.presentationIndex=0;atlas()};
+ $('#composer-open').onclick=showComposer;
  $('#visual-edit').onclick=()=>{S.editorMode='edit';navigate('studio')};$('#print').onclick=()=>window.print();
  $$('[data-zoom]').forEach(img=>img.onclick=()=>zoom(img.dataset.zoom,img.alt));
  $$('[data-map-jump]').forEach(b=>b.onclick=e=>{e.preventDefault();S.mode='atlas';atlas();document.getElementById(b.dataset.mapJump)?.scrollIntoView({behavior:'smooth'})});
  const prev=$('#previous-slide'),next=$('#next-slide');if(prev)prev.onclick=()=>{S.presentationIndex=Math.max(0,S.presentationIndex-1);atlas()};if(next)next.onclick=()=>{S.presentationIndex=Math.min(S.project.sections.length-1,S.presentationIndex+1);atlas()};
+}
+function showComposer(){
+ if(!S.project)return inform('Abra um atlas antes de compor sua apresentação');
+ S.composer=openVisualComposer({
+  project:S.project,config:S.layoutConfig,demo:S.demo,renderSection:groupRender,
+  save:async(config)=>{
+    if(S.demo)return{config};
+    if(!S.docId)throw Error('Nenhum documento do Craft selecionado');
+    return await API('layout-save',{}, {documentId:S.docId,config});
+  },
+  onStored:(config)=>{S.layoutConfig=config;inform(S.demo?'Prévia visual ajustada':'Composição armazenada no Craft')},
+  onClose:()=>{S.composer=null;atlas()},
+  onEditText:(source)=>{
+    const sec=S.project.sections.find(s=>String(s.source||s.key)===String(source));
+    const block=sec?.items?.find(x=>x.block?.type==='text'&&x.block?.id);
+    S.selected=block?.block?.id||'';S.editorMode='edit';navigate('studio');
+  }
+ });
 }
 function renderPresentation(data){
  const n=Math.max(0,Math.min(S.presentationIndex,data.sections.length-1)),section=data.sections[n];
@@ -127,7 +147,7 @@ function login(){
 }
 function render(){$('#logout').classList.toggle('hide',!S.auth);if(!S.auth)return login();if(S.tab==='home')landing();else if(S.tab==='library')library();else if(S.tab==='atlas')atlas();else studio()}
 async function sync(){if(S.loading)return;S.loading=true;try{const [d,c]=await Promise.all([API('documents'),API('connection')]);S.docs=list(d);S.connection=c;render();inform(S.docs.length+' documentos carregados do Craft')}catch(e){inform('Craft: '+e.message)}finally{S.loading=false}}
-async function openDoc(documentId,preserveMode=false){if(!documentId)return;const previous=S.mode;try{const d=await API('document',{id:documentId});S.doc=d;S.docId=documentId;S.project=compile(d);S.demo=false;S.mode=preserveMode?previous:'atlas';navigate('atlas')}catch(e){inform('Falha ao abrir documento: '+e.message)}}
+async function openDoc(documentId,preserveMode=false){if(!documentId)return;const previous=S.mode;try{const d=await API('document',{id:documentId});S.doc=d;S.docId=documentId;S.project=compile(d);S.demo=false;S.mode=preserveMode?previous:'atlas';try{const layout=await API('layout',{documentId});S.layoutConfig=layout.config||null}catch(err){S.layoutConfig=null;console.warn('Layout unavailable',String(err.message||err))}navigate('atlas')}catch(e){inform('Falha ao abrir documento: '+e.message)}}
 $('#theme').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('atlas-theme',document.body.classList.contains('light')?'light':'dark')};
 if(S.theme==='light')document.body.classList.add('light');
 $('#logout').onclick=async()=>{if(!S.demo){try{await API('logout')}catch{}}S.demo=false;S.auth=false;S.doc=null;S.project=null;S.docs=[];navigate('home')};
