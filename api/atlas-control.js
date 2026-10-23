@@ -89,7 +89,7 @@ export function matchesNote(entry,item){
 }
 export function filterLibrary(result,settings){
   if(!settings||settings.libraryMode!=='selected')return result;
-  const filtered=arr=>Array.isArray(arr)?arr.filter(doc=>settings.visibleNotes.some(item=>matchesNote(doc,item))):arr;
+  const filtered=arr=>Array.isArray(arr)?arr.map(doc=>({doc,position:settings.visibleNotes.findIndex(item=>matchesNote(doc,item))})).filter(x=>x.position!==-1).sort((a,b)=>a.position-b.position).map(x=>x.doc):arr;
   if(Array.isArray(result))return filtered(result);
   if(Array.isArray(result?.items))return {...result,items:filtered(result.items)};
   if(Array.isArray(result?.documents))return {...result,documents:filtered(result.documents)};
