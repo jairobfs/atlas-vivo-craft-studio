@@ -25,6 +25,9 @@ jobs:
           node --check visual-core.js
           node --check visual-composer.js
           node --check visual-app.js
+          node --check spatial-core.js
+          node --check spatial-composer.js
+          node --check composer.js
           node --check api/craft.js
       - name: Validate Craft atlas parser, navigation, and safety
         run: npm test
