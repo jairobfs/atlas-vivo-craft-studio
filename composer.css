@@ -81,3 +81,16 @@
 .composer-fullscreen{position:fixed;inset:0;z-index:100;background:var(--bg);overflow:auto;padding:25px 30px 80px;overscroll-behavior:contain}
 .composer-fullscreen .compose-root{max-width:1500px;margin:auto}
 @media(max-width:720px){.composer-fullscreen{padding:15px 12px 80px}}
+
+/* Published/read-only view of a canvas already saved in Craft */
+.spatial-previews{display:grid;gap:19px;margin-top:15px}
+.spatial-preview-section{border:1px solid var(--line);border-radius:17px;background:var(--surface);padding:15px;overflow:hidden}
+.spatial-preview-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin:0 0 15px}
+.spatial-preview-heading h2{margin:5px 0 0;font-size:20px}
+.spatial-preview-frame{position:relative;width:100%;overflow:hidden;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.spatial-preview-frame .compose-board{position:absolute;left:0;top:0}
+.spatial-preview-frame .compose-block{pointer-events:none;user-select:text;cursor:default}
+.spatial-preview-frame .compose-resize{display:none!important}
+.spatial-preview-frame .compose-artboard-label{font-size:12px}
+@media(max-width:720px){.spatial-preview-section{padding:8px}.spatial-preview-heading{padding:8px}}
+@media print{.spatial-preview-frame{overflow:visible!important;height:619px!important;border:none!important}.spatial-preview-frame .compose-board{transform:none!important;position:relative!important;width:1100px!important;height:619px!important}.spatial-preview-section{break-after:page;border:none}.spatial-preview-heading{display:none}}
