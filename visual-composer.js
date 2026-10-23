@@ -55,7 +55,7 @@ function cardMarkup(section,opt,i,selected,full,renderSection){
   figure+'<div class="vc-excerpt">'+esc(excerpt(section))+'</div><div class="vc-icons">'+iconrow+'</div>';
  return '<article class="vc-card '+(opt.display==='half'?'vc-half':opt.display==='feature'?'vc-feature':'')+(opt.display==='hidden'?' vc-muted':'')+(opt.source===selected?' selected':'')+'" data-select="'+esc(opt.source)+'" draggable="true" data-drag="'+esc(opt.source)+'"><div class="vc-card-header"><span class="vc-kicker">PRANCHA '+String(i+1).padStart(2,'0')+'</span><span class="vc-handle" title="Arraste para reorganizar">⋮⋮</span></div><h3>'+esc(section.name)+'</h3>'+body+'</article>';
 }
-export function openVisualComposer({project,config,renderSection,save,onClose,onStored,onEditText}){
+export function openVisualComposer({project,config,renderSection,save,onClose,onStored,onEditText,demo=false}){
  const state=normalizeVisualConfig(project,config);
  state.selected=state.order[0]?.source||'';
  state.full=false;
@@ -95,7 +95,7 @@ export function openVisualComposer({project,config,renderSection,save,onClose,on
   const view=sections(),selected=state.selected;
   const palettes=PRESETS.map(p=>'<button class="vc-preset '+(state.layout===p.id?'chosen':'')+'" data-preset="'+p.id+'"><span>'+esc(p.name)+'</span><small>'+esc(p.detail)+'</small></button>').join('');
   shell.innerHTML='<div class="vc-wrap">'+
-   '<header class="vc-top"><div class="vc-heading"><span class="vc-mark">ATLAS VIVO / COMPOSITOR</span><strong>Ateliê visual</strong><small>O conteúdo vive no Craft. A composição também.</small></div><div class="vc-actions"><span id="vc-status">'+(dirty?'Alterações ainda não salvas':'Composição atual')+'</span><button id="vc-cancel" class="vc-mini">Fechar</button><button id="vc-save" class="vc-save" '+(busy?'disabled':'')+'>Salvar no Craft</button></div></header>'+
+   '<header class="vc-top"><div class="vc-heading"><span class="vc-mark">ATLAS VIVO / COMPOSITOR</span><strong>Ateliê visual</strong><small>O conteúdo vive no Craft. A composição também.</small></div><div class="vc-actions"><span id="vc-status">'+(dirty?'Alterações ainda não salvas':'Composição atual')+'</span><button id="vc-cancel" class="vc-mini">Fechar</button><button id="vc-save" class="vc-save" '+(busy?'disabled':'')+'>"+(demo?'Aplicar à demonstração':'Salvar no Craft')+"</button></div></header>'+
    '<div class="vc-body"><aside class="vc-left"><div class="vc-pane-title">Linguagem visual</div><p class="vc-muted-text">Escolha um sistema de composição. A mudança aparece imediatamente.</p>'+palettes+
    '<div class="vc-pane-title" style="margin-top:23px">Densidade</div><div class="vc-segment">'+['compact','balanced','expanded'].map(p=>'<button data-density="'+p+'" class="vc-mini '+(state.density===p?'chosen':'')+'">'+({compact:'Sintética',balanced:'Equilibrada',expanded:'Ampliada'}[p])+'</button>').join('')+'</div></aside>'+
    '<section class="vc-center"><div class="vc-canvas-head"><div><div class="vc-pane-title">Pranchas do documento</div><p>Toque para selecionar. Arraste ou use as setas para mudar a ordem.</p></div><button id="vc-detail" class="vc-mini">'+(state.full?'Prévia simplificada':'Mostrar conteúdo integral')+'</button></div>'+
@@ -107,7 +107,7 @@ export function openVisualComposer({project,config,renderSection,save,onClose,on
    try{
     const payload={version:1,layout:state.layout,density:state.density,order:state.order.map(x=>({source:x.source,title:x.title,display:x.display}))};
     const saved=await save(payload);dirty=false;onStored?.(saved?.config||payload);draw();
-    const status=shell.querySelector('#vc-status');status.textContent='Salvo no Craft';
+    const status=shell.querySelector('#vc-status');status.textContent=demo?'Aplicado à demonstração':'Salvo no Craft';
    }catch(err){
     const status=shell.querySelector('#vc-status');status.textContent='Não foi salvo: '+String(err.message||err);
     btn.textContent='Tentar novamente';
