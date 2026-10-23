@@ -251,11 +251,14 @@ $('#logout').onclick=async()=>{if(!S.demo){try{await API('logout')}catch{}}S.dem
 
 let lastAutoRefresh=0;
 function refreshOnReturn(){
- if(!S.auth||S.demo||S.settings?.autoRefresh===false||S.tab!=='atlas'||!S.docId)return;
+ if(!S.auth||S.demo||S.settings?.autoRefresh===false||S.loading)return;
+ // Do not overwrite unsaved edits in the owner console or study editor.
+ if(!['atlas','home','library'].includes(S.tab))return;
  const now=Date.now();
  if(now-lastAutoRefresh<15000)return;
  lastAutoRefresh=now;
- openDoc(S.docId,true);
+ if(S.tab==='atlas'&&S.docId)openDoc(S.docId,true);
+ else sync();
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshOnReturn()});
 window.addEventListener('focus',refreshOnReturn);
