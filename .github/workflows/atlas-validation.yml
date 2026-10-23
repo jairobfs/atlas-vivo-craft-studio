@@ -20,5 +20,11 @@ jobs:
           persist-credentials: false
       - name: Check runtime
         run: node --version
+      - name: Validate browser modules and API syntax
+        run: |
+          node --check visual-core.js
+          node --check visual-composer.js
+          node --check visual-app.js
+          node --check api/craft.js
       - name: Validate Craft atlas parser, navigation, and safety
         run: npm test
