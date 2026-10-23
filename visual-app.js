@@ -1,5 +1,6 @@
 import {esc,safe,list,flat,title,id,raw,rich,image,level,kind,compile,clean,steps,sides,rows,demo} from './visual-core.js';
 import {openVisualComposer,orderedVisualSections} from './visual-composer.js';
+import {mountComposer} from './composer.js';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'atlas',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false,layoutConfig:null,composer:null};
 const menu=[['home','Painel'],['library','Biblioteca'],['atlas','Atlas visual'],['studio','Estúdio']];
@@ -76,17 +77,31 @@ function atlas(){
  if(!S.project){$('#screen').innerHTML='<div class="empty">Selecione um documento para construir o atlas.</div>';return}
  const v={...S.project,sections:orderedVisualSections(S.project,S.layoutConfig)},demoFlag=S.demo;
  const u=craftURL();
- $('#screen').innerHTML='<div class="article"><div class="article-head"><div class="eyebrow">ATLAS VISUAL · COLORHUB × UNIVERSO</div><h1>'+esc(v.title)+'</h1><p class="outline-label">'+(demoFlag?'Exemplo autoral de apresentação. Abra uma nota para renderizar conteúdo verdadeiro.':'Composição editorial estruturada a partir dos blocos originais do Craft.')+'</p><div class="bar"><div class="pillset"><span class="chip">'+v.sections.length+' pranchas</span><span class="chip">'+v.figures+' imagens</span><span class="chip">'+v.tables+' tabelas</span>'+(v.missingFigures?.length?'<button class="btn small audit-figure" id="audit-figures">'+v.missingFigures.length+' figuras pendentes</button>':'')+'</div><div class="actions"><button class="btn small" id="refresh">Atualizar</button>'+(!demoFlag&&u?'<a class="btn small primary" href="'+esc(u)+'">Editar no Craft ↗</a>':'')+'</div></div><div class="actions" style="margin-top:13px"><button class="btn small '+(S.mode==='atlas'?'active':'')+'" id="atlas-mode">Pranchas editoriais</button><button class="btn small '+(S.mode==='map'?'active':'')+'" id="map-mode">Mapa mental</button><button class="btn small '+(S.mode==='presentation'?'active':'')+'" id="presentation-mode">Apresentar 16:9</button><button class="btn small primary" id="composer-open">Compor visualmente</button><button class="btn small" id="visual-edit">Editar textos</button><button class="btn small" id="print">Exportar PDF</button></div></div>'+
+ $('#screen').innerHTML='<div class="article"><div class="article-head"><div class="eyebrow">ATLAS VISUAL · COLORHUB × UNIVERSO</div><h1>'+esc(v.title)+'</h1><p class="outline-label">'+(demoFlag?'Exemplo autoral de apresentação. Abra uma nota para renderizar conteúdo verdadeiro.':'Composição editorial estruturada a partir dos blocos originais do Craft.')+'</p><div class="bar"><div class="pillset"><span class="chip">'+v.sections.length+' pranchas</span><span class="chip">'+v.figures+' imagens</span><span class="chip">'+v.tables+' tabelas</span>'+(v.missingFigures?.length?'<button class="btn small audit-figure" id="audit-figures">'+v.missingFigures.length+' figuras pendentes</button>':'')+'</div><div class="actions"><button class="btn small" id="refresh">Atualizar</button>'+(!demoFlag&&u?'<a class="btn small primary" href="'+esc(u)+'">Editar no Craft ↗</a>':'')+'</div></div><div class="actions" style="margin-top:13px"><button class="btn small '+(S.mode==='atlas'?'active':'')+'" id="atlas-mode">Pranchas editoriais</button><button class="btn small '+(S.mode==='map'?'active':'')+'" id="map-mode">Mapa mental</button><button class="btn small '+(S.mode==='presentation'?'active':'')+'" id="presentation-mode">Apresentar 16:9</button><button class="btn small primary" id="composer-open">Compor visualmente</button><button class="btn small" id="canvas-open">Canvas livre</button><button class="btn small" id="visual-edit">Editar textos</button><button class="btn small" id="print">Exportar PDF</button></div></div>'+
  (S.mode==='map'?renderMap(v):S.mode==='presentation'?renderPresentation(v):'<div class="article-toc">'+v.sections.map(s=>'<a href="#'+esc(s.key)+'">'+esc(s.name)+'</a>').join('')+'</div><div class="atlas-stack layout-'+esc(S.layoutConfig?.layout||'editorial')+' density-'+esc(S.layoutConfig?.density||'balanced')+'">'+v.sections.map(groupRender).join('')+'</div>')+
  '<div class="footer-note">Origem: Craft. Figuras originais preservadas. Este renderizador não substitui revisão científica das fontes.</div></div>';
  $('#refresh').onclick=()=>{if(S.demo){S.project=compile(demo());atlas()}else openDoc(S.docId)};
  $('#atlas-mode').onclick=()=>{S.mode='atlas';atlas()};$('#map-mode').onclick=()=>{S.mode='map';atlas()};$('#presentation-mode').onclick=()=>{S.mode='presentation';S.presentationIndex=0;atlas()};
  $('#composer-open').onclick=showComposer;
+ $('#canvas-open').onclick=showSpatialComposer;
  const audit=$('#audit-figures');if(audit)audit.onclick=showFigureAudit;
  $('#visual-edit').onclick=()=>{S.editorMode='edit';navigate('studio')};$('#print').onclick=()=>window.print();
  $$('[data-zoom]').forEach(img=>img.onclick=()=>zoom(img.dataset.zoom,img.alt));
  $$('[data-map-jump]').forEach(b=>b.onclick=e=>{e.preventDefault();S.mode='atlas';atlas();document.getElementById(b.dataset.mapJump)?.scrollIntoView({behavior:'smooth'})});
  const prev=$('#previous-slide'),next=$('#next-slide');if(prev)prev.onclick=()=>{S.presentationIndex=Math.max(0,S.presentationIndex-1);atlas()};if(next)next.onclick=()=>{S.presentationIndex=Math.min(S.project.sections.length-1,S.presentationIndex+1);atlas()};
+}
+function showSpatialComposer(){
+ if(!S.doc||!S.project){inform('Abra um atlas antes de compor');return}
+ const existing=document.getElementById('atlas-spatial-composer');
+ if(existing)return;
+ const sheet=document.createElement('section');
+ sheet.id='atlas-spatial-composer';sheet.className='composer-fullscreen';
+ sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');
+ sheet.setAttribute('aria-label','Composição visual livre do Atlas Vivo');
+ document.body.append(sheet);
+ let handle;
+ const close=()=>{handle?.cleanup?.();sheet.remove();};
+ handle=mountComposer({target:sheet,doc:S.doc,documentId:S.docId,demo:S.demo,api:API,onBack:close});
 }
 function showFigureAudit(){
  const missing=S.project?.missingFigures||[];
