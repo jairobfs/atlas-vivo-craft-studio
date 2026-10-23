@@ -223,6 +223,5 @@ export function mountComposer(ctx){
  $('#compose-board-name',target).onchange=e=>{getBoard().name=e.target.value.slice(0,95);schedule();renderBoard()};
  return{cleanup:()=>{disposed=true;clearTimeout(timer);ctx.cleanup?.()},getLayout:()=>layout};
 }
-function styleFor(k){return k==='image'?'picture':k==='callout'?'warning':k==='heading'?'hero':'normal'}
 export function getLayoutMetadata(doc){return extract(doc)}
 export function layoutMetadataMarker(){return PREFIX}
