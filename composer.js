@@ -94,7 +94,7 @@ export function mountComposer(ctx){
   saving=true;const version=dirty;state('Salvando composição no Craft…');
   const markdown=str(layout);
   try{
-   const out=await ctx.api('layout',{}, {
+   const out=await ctx.api('composition',{}, {
      documentId:ctx.documentId,blockId:layoutBlock?.id||null,
      originalMarkdown:originalLayoutMarkdown,markdown
    });
