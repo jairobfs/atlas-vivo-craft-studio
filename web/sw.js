@@ -1,5 +1,5 @@
 /* Public PWA app-shell cache only; exclude all Craft APIs and user data. */
-const CACHE='atlas-vivo-uct20-shell-v22';
+const CACHE='atlas-vivo-uct20-shell-v23';
 const ASSETS=['/','/index.html','/style.css','/clinical-lab.css','/clinical-lab.js','/knowledge-panels.js','/app.js','/model3d.js','/webgl3d.js','/craft-sync.js','/maneuver-engine.js','/unified-data.js','/mechanism-workbench.js','/progress-transfer.js','/visual-summaries.css','/visual-summaries.js','/favicon.svg','/manifest.webmanifest','/apple-touch-icon.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('atlas-vivo-uct20-shell-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});

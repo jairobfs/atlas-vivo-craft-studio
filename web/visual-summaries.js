@@ -127,7 +127,7 @@
     const question=topic.test;
     root.innerHTML=
     '<div class="vs-paper" data-vs-paper="'+topic.id+'">'+
-    '<header class="vs-paper-head"><div class="vs-paper-meta"><span>'+topic.kicker+'</span><span>ATLAS VIVO · SÍNTESE VISUAL 2026</span></div><h2>'+topic.title+'</h2><p>'+topic.sub+'</p><div class="vs-paper-actions"><button type="button" data-vs-3d="'+topic.model+'" data-vs-part="'+topic.part+'">Explorar estrutura em 3D →</button><button type="button" data-vs-chapter="'+topic.sp.toLowerCase()+'">Abrir capítulo aprofundado →</button></div></header>'+
+    '<header class="vs-paper-head"><div class="vs-paper-meta"><span>'+topic.kicker+'</span><span>ATLAS VIVO · SÍNTESE VISUAL 2026</span></div><h2>'+topic.title+'</h2><p>'+topic.sub+'</p><div class="vs-paper-actions"><button type="button" data-vs-model="'+topic.model+'" data-vs-part="'+topic.part+'">Explorar estrutura em 3D →</button><button type="button" data-vs-print="yes">Imprimir / PDF</button><button type="button" data-vs-chapter="'+topic.sp.toLowerCase()+'">Abrir capítulo aprofundado →</button></div></header>'+
     '<div class="vs-paper-body">'+renderers[topic.id]()+renderLinks(topic)+
     '<section class="vs-check"><span>RECUPERAÇÃO ATIVA</span><h3>Antes de sair, teste a decisão.</h3><p>'+question.q+'</p><div class="vs-answers">'+question.options.map((x,i)=>'<button type="button" data-vs-answer="'+i+'" aria-pressed="'+String(st.answer===i)+'"><span>'+String.fromCharCode(65+i)+'</span>'+x+'</button>').join('')+'</div><div class="vs-answer-feedback" id="vs-answer-feedback" role="status" aria-live="polite">'+(st.answer===null?'':(st.answer===question.correct?'<b>Correto.</b> ':'<b>Revisar.</b> ')+question.why)+'</div></section>'+
     '<div class="vs-paper-end"><div><b>Revisão pessoal</b><p>Marcar como estudado registra leitura, não domínio clínico.</p></div><button type="button" id="vs-mark-read" aria-pressed="'+String(!!st.read)+'">'+(st.read?'Estudado · desfazer':'Marcar como estudado')+'</button></div>'+
@@ -149,9 +149,10 @@
     if(b.dataset.vsGustilo){grade=b.dataset.vsGustilo;root.querySelector('#vs-gustilo-detail').innerHTML=gustiloDetails();root.querySelectorAll('[data-vs-gustilo]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.vsGustilo===grade)));return}
     if(b.dataset.vsHealing!==undefined){healing=Number(b.dataset.vsHealing);root.querySelectorAll('[data-vs-healing]').forEach(x=>x.setAttribute('aria-pressed',String(Number(x.dataset.vsHealing)===healing)));const target=root.querySelector('#vs-healing-note');if(target)target.innerHTML='Fase em foco: <b>'+healingStages[healing].name+'</b>. '+healingStages[healing].text;return}
     if(b.dataset.vsPattern){pattern=b.dataset.vsPattern;root.querySelectorAll('[data-vs-pattern]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.vsPattern===pattern)));const target=root.querySelector('#vs-pattern-note');if(target)target.innerHTML='<strong>'+patterns[pattern].label+': </strong>'+patterns[pattern].desc;return}
+    if(b.hasAttribute('data-vs-print')){window.print();return}
     if(b.dataset.vsChapter){window.AtlasGo?.('capitulos');window.AtlasKnowledgeSync?.(b.dataset.vsChapter);return}
-    if(b.dataset.vs3d){
-      const name=b.dataset.vs3d,part=b.dataset.vsPart;
+    if(b.dataset.vsModel){
+      const name=b.dataset.vsModel,part=b.dataset.vsPart;
       window.AtlasGo?.('3d');window.AtlasModel3D?.setModel(name);window.AtlasModel3D?.selectPart(part);
       const banner=document.getElementById('summary-return-banner');if(banner)banner.hidden=false;
       return;

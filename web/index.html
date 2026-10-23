@@ -22,7 +22,7 @@
       let replacing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (replacing) return;
-        const key = 'atlas-vivo-updated-v21';
+        const key = 'atlas-vivo-updated-v23';
         try {
           if (sessionStorage.getItem(key)) return;
           sessionStorage.setItem(key, '1');
@@ -127,7 +127,7 @@
         </section>
 
         <section id="page-resumos" class="page" aria-label="Resumos visuais e cadernos editoriais">
-          <header class="vs-hero"><span>SÍNTESES CIENTÍFICAS · EDIÇÃO VISUAL 2026</span><h1>Resumos para<br><em>raciocinar melhor.</em></h1><p>Seis cadernos originais baseados nos temas da UCT20: quadros clínicos, classificações, diagramas editáveis, perguntas comentadas e ligação imediata com a anatomia em 3D.</p><div class="vs-hero-tail"><span>SP1–SP4</span><span>6 resumos</span><span>Rigor clínico</span><span>Mobile-first</span></div></header>
+          <header class="vs-hero"><span>SÍNTESES CIENTÍFICAS · EDIÇÃO VISUAL 2026</span><h1>Resumos para<br><em>raciocinar melhor.</em></h1><p>Seis cadernos originais baseados nos temas da UCT20: quadros clínicos, classificações, diagramas vetoriais, perguntas comentadas e ligação imediata com a anatomia em 3D.</p><div class="vs-hero-tail"><span>SP1–SP4</span><span>6 resumos</span><span>Rigor clínico</span><span>Mobile-first</span></div></header>
           <div class="vs-subnav"><div><h2>Escolha o tema</h2><small>Conteúdo reconstruído em seções nativas, não capturas de tela.</small></div><span id="visual-summary-progress" role="status" aria-live="polite">0 de 6 estudados</span></div>
           <nav id="visual-summary-catalog" class="vs-catalog" aria-label="Selecionar resumo visual"></nav>
           <article id="visual-summary-content" aria-label="Resumo visual selecionado"></article>
