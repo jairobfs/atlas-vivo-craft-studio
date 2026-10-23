@@ -85,3 +85,49 @@ test('Craft owner can disable authoring without disabling reading',()=>{
  assert.equal(c.editingEnabled,false);
  assert.equal(c.creationEnabled,false);
 });
+
+
+test('Control syntax matches actual Craft native h2 and body blocks after editorial cleanup',()=>{
+ const root={data:[{id:'194aec94-79cf-af4d-8d33-085219b12bb9',type:'page',markdown:'Central de Controle',content:[
+  {type:'text',textStyle:'body',markdown:'Painel administrativo · Edição direta no Craft'},
+  {type:'text',textStyle:'h2',markdown:'## 01 · Acesso ao aplicativo'},
+  {type:'text',markdown:'Código de acesso: exemplo-privado'},
+  {type:'text',markdown:'Sessão: 30 dias'},
+  {type:'text',textStyle:'h2',markdown:'## 02 · Biblioteca publicada'},
+  {type:'text',markdown:'Modo da biblioteca: selecionadas'},
+  {type:'text',markdown:'Exibir: ATLAS VIVO · Estúdio editorial — piloto sem código'},
+  {type:'text',markdown:'Exibir: ATLAS VIVO · Componentes visuais — Manual de autoria'},
+  {type:'text',textStyle:'h2',markdown:'## 03 · Aparência e estudo'},
+  {type:'text',markdown:'Visualização padrão: imersivo'},
+  {type:'text',textStyle:'h2',markdown:'## 05 · Edição e sincronização'},
+  {type:'text',markdown:'Permitir edição no ATLAS: sim'}
+ ]}]};
+ const x=parseControlDocument(root);
+ assert.equal(x.accessCode,'exemplo-privado');
+ assert.equal(x.libraryMode,'selected');
+ assert.equal(x.visibleNotes.length,2);
+ assert.equal(x.view,'immersive');
+ assert.equal(x.editingEnabled,true);
+ assert.equal(safeControl(x).accessCode,undefined);
+});
+test('Filter accepts Craft rootBlockId with rich title objects and omits trashed docs',()=>{
+ const policy=parseControlDocument(input);
+ const data={items:[
+  {rootBlockId:'1',title:{text:{value:'ATLAS VIVO · Componentes visuais — Manual de autoria'}}},
+  {rootBlockId:'2',title:'ATLAS VIVO · Estúdio editorial — piloto sem código'},
+  {rootBlockId:'3',title:'ATLAS VIVO · Estúdio editorial — piloto sem código',isDeleted:true},
+  {rootBlockId:'4',title:'ATLAS VIVO · Estúdio editorial — piloto sem código',location:'trash'}
+ ]};
+ assert.deepEqual(filterLibrary(data,policy).items.map(x=>x.rootBlockId),['2','1']);
+});
+test('Source ID matching supports API search result exposedDocumentId',()=>{
+ assert.equal(matchesNote({exposedDocumentId:'f9b76d84-4ccb-4aaa-aa12-ffdde3440001'},'f9b76d84-4ccb-4aaa-aa12-ffdde3440001'),true);
+});
+test('Server handles search results by exposedDocumentId and has short-lived Craft control cache',async()=>{
+ const {readFileSync}=await import('node:fs');
+ const code=readFileSync(new URL('../api/craft.js',import.meta.url),'utf8');
+ assert.match(code,/controlCacheUntil/);
+ assert.match(code,/exposedDocumentId/);
+ assert.match(code,/safeControl\(control\)/);
+ assert.match(code,/filterLibrary\(await craft\('\/documents\?fetchMetadata=true'\)/);
+});
