@@ -109,6 +109,31 @@ export default async function handler(req, res) {
         body: JSON.stringify({ markdown, position: { pageId: id, position: 'end' } }),
       }));
     }
+    if (op === 'update' && req.method === 'POST') {
+      const b = await input(req);
+      const id = b.id || b.blockId;
+      if (!validId(id) || typeof b.markdown !== 'string' || b.markdown.length > 30000) {
+        return json(res, 400, { error: 'Bloco ou conteúdo inválido' });
+      }
+      // Craft's official API: PUT /blocks with a blocks[] payload, preserving block IDs.
+      return json(res, 200, await craft('/blocks', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blocks: [{ id, markdown: b.markdown }] }),
+      }));
+    }
+    if (op === 'visual' && req.method === 'POST') {
+      const b = await input(req);
+      if (!validId(b.documentId) || !Array.isArray(b.blocks) || b.blocks.length === 0 || b.blocks.length > 12) {
+        return json(res, 400, { error: 'Componentes inválidos' });
+      }
+      // Inserts native headings and text. Craft remains the sole source of truth.
+      const markdown = b.blocks.map(x => limited(x.markdown, 2500).trim()).filter(Boolean).join('\n\n');
+      if (!markdown.trim()) return json(res, 400, { error: 'Blocos vazios' });
+      return json(res, 200, await craft('/blocks', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markdown, position: { pageId: b.documentId, position: 'end' } }),
+      }));
+    }
     if (op === 'upload' && req.method === 'POST') {
       const id = u.searchParams.get('id');
       const position = u.searchParams.get('position') || 'end';
