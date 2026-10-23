@@ -185,3 +185,26 @@ export function openSpatialComposer({mount,project,config,demo=false,save,onStor
  draw();
  return {close,save:saveNow,getCanvas:()=>canvas};
 }
+
+
+export function renderSpatialDocument(project,layoutConfig){
+ const saved=Boolean(layoutConfig?.canvas?.boards?.length);
+ const c=normalizeCanvas(project,layoutConfig?.canvas),available=sourceMap(project);
+ const boards=c.boards.map((b,i)=>{
+   const pieces=b.nodes.map(n=>{
+     const block=available.get(String(n.source));if(!block)return '';
+     const k=kind(block),design=k==='image'&&n.design==='standard'?'picture':n.design;
+     return '<div class="compose-block" data-design="'+esc(design)+'" style="left:'+n.x+'px;top:'+n.y+'px;width:'+n.w+'px;height:'+n.h+'px"><div class="component-type">'+esc(typeName[k]||'CONCEITO')+'</div>'+nodeContent(block)+'</div>';
+   }).join('');
+   return '<section class="spatial-preview-section"><div class="spatial-preview-heading"><div><span class="eyebrow">LOUSA '+String(i+1).padStart(2,'0')+' · COMPOSIÇÃO 16:9</span><h2>'+esc(b.title)+'</h2></div><span class="chip">'+b.nodes.length+' elementos</span></div><div class="spatial-preview-frame"><div class="compose-board" data-skin="'+esc(c.skin)+'"><div class="board-orbit a"></div><div class="board-orbit b"></div><div class="compose-artboard-label">ATLAS VIVO · '+esc(b.title.toUpperCase().slice(0,70))+'</div>'+pieces+'<div class="board-footer">CRAFT × COLORHUB · COMPOSIÇÃO EDITORIAL</div></div></div></section>';
+ }).join('');
+ return '<div class="spatial-previews"><p class="muted mini">'+(saved?'Estas lousas utilizam o posicionamento gravado no Craft.':'Prévia automática: personalize e grave a distribuição no Canvas livre.')+'</p>'+boards+'</div>';
+}
+export function scaleSpatialPreviews(){
+ document.querySelectorAll('.spatial-preview-frame').forEach(frame=>{
+   const board=frame.querySelector('.compose-board');if(!board)return;
+   const scale=Math.min(1,Math.max(.1,frame.clientWidth/BOARD_W));
+   frame.style.height=Math.ceil(BOARD_H*scale)+'px';
+   board.style.transform='scale('+scale+')';
+ });
+}
