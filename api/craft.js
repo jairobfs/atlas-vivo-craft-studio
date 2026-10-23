@@ -96,6 +96,25 @@ export default async function handler(req, res) {
         body: JSON.stringify({ documents: [{ title }], destination: { destination: 'unsorted' } }),
       }));
     }
+    if (op === 'update' && req.method === 'POST') {
+      const b = await input(req);
+      const id = b.blockId || b.id;
+      if (!validId(id)) return json(res, 400, { error: 'ID de bloco inválido' });
+      const markdown = limited(b.markdown, 30000);
+      if (!markdown.trim()) return json(res, 400, { error: 'O bloco não pode ficar vazio' });
+      if (typeof b.originalMarkdown !== 'string') return json(res, 400, { error: 'Leia a versão do bloco antes de alterá-la' });
+      // Optimistic concurrency: refuse to overwrite a Craft change made after opening the editor.
+      const latest = await craft('/blocks?id=' + encodeURIComponent(id) + '&maxDepth=0');
+      const candidate = Array.isArray(latest?.data) ? latest.data[0] : Array.isArray(latest?.items) ? latest.items[0] : latest?.data || latest;
+      if (candidate && typeof candidate.markdown === 'string' && candidate.markdown !== b.originalMarkdown) {
+        return json(res, 409, { error: 'Este bloco foi modificado no Craft. Atualize o atlas antes de salvar.' });
+      }
+      return json(res, 200, await craft('/blocks', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blocks: [{ id, markdown }] }),
+      }));
+    }
     if (op === 'append' && req.method === 'POST') {
       const b = await input(req);
       const id = b.documentId || b.id;
