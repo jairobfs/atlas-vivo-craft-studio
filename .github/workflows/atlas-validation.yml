@@ -30,5 +30,8 @@ jobs:
           node --check immersive-atlas.js
           node --check composer.js
           node --check api/craft.js
+          node --check api/atlas-control.js
+          node --check api/atlas-admin.js
+          node --check admin-panel.js
       - name: Validate Craft atlas parser, navigation, and safety
         run: npm test
