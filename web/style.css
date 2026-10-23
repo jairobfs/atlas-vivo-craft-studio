@@ -649,3 +649,21 @@ main{padding-top:40px}.kicker,.eyebrow{font-size:12px;line-height:1.5}
 @media(max-width:820px){.chapter-model-bridge{grid-template-columns:1fr}.chapter-model-visual{min-height:340px}.chapter-model-visual #craft-context-canvas{height:390px}.chapter-model-copy{padding:23px 20px}.chapter-model-bridge{margin:19px 0}}
 @media(max-width:600px){.chapter-model-bridge{border-radius:17px}.chapter-model-copy h4{font-size:29px}.chapter-model-visual #craft-context-canvas{height:clamp(310px,43svh,440px)}.chapter-model-copy>p{font-size:14px}.chapter-model-actions button{flex:1 1 140px;min-height:52px;font-size:13px}.chapter-model-terms button{min-height:47px}.chapter-model-return{flex-direction:column;align-items:stretch;padding:15px}.chapter-model-return button{width:100%}}
 @media(prefers-reduced-motion:reduce){.chapter-model-bridge{scroll-behavior:auto}}
+
+/* V21: explicit 3D motion timeline inside each chapter */
+.chapter-model-timeline{
+  display:grid;grid-template-columns:auto minmax(64px,1fr) auto;
+  gap:9px 13px;align-items:center;
+  margin:0 15px 13px;padding:12px;border:1px solid #396979;
+  border-radius:13px;background:#092833;color:#d5f3ed;
+}
+.chapter-model-timeline button{
+  border:1px solid #81d6cc;background:#8be1d3;color:#092832;
+  border-radius:9px;min-height:47px;padding:10px 16px;
+  font-size:13px;font-weight:800;cursor:pointer;
+}
+.chapter-model-timeline input{width:100%;min-width:0;accent-color:#83ddd0;cursor:pointer;min-height:40px}
+.chapter-model-timeline output{font-size:14px;font-weight:850;font-variant-numeric:tabular-nums;color:#a9efdf}
+.chapter-model-timeline [data-3d-caption]{grid-column:1/-1;text-align:center;font-size:12px;line-height:1.35;color:#b7d8d6}
+.chapter-model-timeline button:focus-visible,.chapter-model-timeline input:focus-visible{outline:3px solid #eeb47d;outline-offset:3px}
+@media(max-width:365px){.chapter-model-timeline{grid-template-columns:1fr auto}.chapter-model-timeline button{grid-column:1/-1}.chapter-model-timeline input{grid-column:1}}

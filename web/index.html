@@ -15,7 +15,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,600,50,0;9..144,700,50,0&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+  <script>
+    // PWA upgrades must replace stale V19/V20 scripts before studying.
+    (() => {
+      if (!('serviceWorker' in navigator)) return;
+      let replacing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (replacing) return;
+        const key = 'atlas-vivo-updated-v21';
+        try {
+          if (sessionStorage.getItem(key)) return;
+          sessionStorage.setItem(key, '1');
+        } catch (_) { /* ephemeral browsing may not allow storage */ }
+        replacing = true;
+        location.reload();
+      });
+      navigator.serviceWorker.getRegistration().then(registration => registration?.update()).catch(() => {});
+    })();
+  </script>
+    <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/clinical-lab.css">
 </head>
 <body>
@@ -156,7 +174,13 @@
                 <div class="chapter-model-visual">
                   <div class="chapter-model-overline">3D REAL · TOQUE, ARRASTE OU USE PINÇA</div>
                   <canvas id="craft-context-canvas" tabindex="0" aria-label="Modelo 3D didático: arraste para girar, pinça para zoom e toque para identificar uma estrutura"></canvas>
-                  <div class="chapter-model-stage-note">Modelo ilustrativo · fora de escala</div>
+                  <div class="chapter-model-timeline" role="group" aria-label="Controle interativo da animação 3D">
+                    <button type="button" data-3d-play aria-pressed="false">Reproduzir</button>
+                    <input type="range" min="0" max="100" value="0" data-3d-progress aria-label="Avançar ou retroceder o movimento 3D">
+                    <output data-3d-phase aria-label="Posição da animação">0%</output>
+                    <span data-3d-caption>Posição inicial</span>
+                  </div>
+                                    <div class="chapter-model-stage-note">Modelo ilustrativo · fora de escala</div>
                 </div>
               </section>
             </div>
