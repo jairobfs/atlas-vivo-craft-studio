@@ -4,7 +4,7 @@ import {openSpatialComposer,renderSpatialDocument,scaleSpatialPreviews} from './
 import {renderImmersiveAtlas,bindImmersiveAtlas} from './immersive-atlas.js';
 import {renderAdminConsole} from './admin-panel.js';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'immersive',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false,layoutConfig:null,composer:null,spatial:null,settings:null};
+let S={auth:false,tab:'home',docs:[],doc:null,docId:'',project:null,filter:'',mode:'immersive',presentationIndex:0,theme:localStorage.getItem('atlas-theme')||'dark',demo:false,selected:'',draft:'',editorMode:'edit',review:0,answers:{},loading:false,layoutConfig:null,composer:null,spatial:null,settings:null,adminStartTab:'library'};
 const menu=[['home','Painel'],['library','Biblioteca'],['atlas','Atlas visual'],['studio','Estúdio'],['control','Meu ATLAS']];
 async function API(op,args={},data){
  const u=new URL('/api/craft',location.href);u.searchParams.set('op',op);
@@ -26,8 +26,9 @@ function landing(){
 }
 function library(){
  let docs=S.docs.filter(d=>title(d).toLowerCase().includes(S.filter.toLowerCase()));
- $('#screen').innerHTML='<div class="section-top"><div><div class="eyebrow">CONTEÚDO FONTE · CRAFT</div><h1>Biblioteca viva</h1></div><div class="actions"><button id="manage-library" class="btn small outline">Gerenciar biblioteca</button><button id="sync" class="btn">Sincronizar</button></div></div><input class="field" id="search" placeholder="Pesquise por título..." value="'+esc(S.filter)+'"><div class="mini muted" id="result-count">'+docs.length+' documentos · clique para construir a visualização</div><div id="cards" class="grid" style="margin-top:16px">'+docs.map(documentCard).join('')+'</div>';
- $('#manage-library').onclick=()=>navigate('control');
+ $('#screen').innerHTML='<div class="section-top"><div><div class="eyebrow">CONTEÚDO FONTE · CRAFT</div><h1>Biblioteca viva</h1></div><div class="actions"><button id="manage-library" class="btn small outline">Gerenciar biblioteca</button><button id="add-new-note" class="btn small primary">+ Nova nota</button><button id="sync" class="btn">Sincronizar</button></div></div><input class="field" id="search" placeholder="Pesquise por título..." value="'+esc(S.filter)+'"><div class="mini muted" id="result-count">'+docs.length+' documentos · clique para construir a visualização</div><div id="cards" class="grid" style="margin-top:16px">'+docs.map(documentCard).join('')+'</div>';
+ $('#manage-library').onclick=()=>{S.adminStartTab='library';navigate('control')};
+ $('#add-new-note').onclick=()=>{S.adminStartTab='create';navigate('control')};
  $('#sync').onclick=sync;$('#search').oninput=e=>{S.filter=e.target.value;let v=S.docs.filter(d=>title(d).toLowerCase().includes(S.filter.toLowerCase()));$('#cards').innerHTML=v.map(documentCard).join('');$('#result-count').textContent=v.length+' documentos';bindCards()};bindCards();
 }
 function craftURL(){
@@ -160,11 +161,27 @@ function studio(){
  if(!S.project){$('#screen').innerHTML='<div class="hero"><div class="eyebrow">ESTÚDIO</div><h1>Edição visual, sem código.</h1><p>Abra um atlas real para editar suas seções e componentes.</p><button class="btn primary" id="choose">Escolher nota Craft</button></div>';$('#choose').onclick=()=>navigate('library');return}
  const blocks=S.project.body.filter(b=>b.type==='text'||b.type==='code');
  const options=blocks.map(b=>'<button class="editrow '+(S.selected===b.id?'active':'')+'" data-edit="'+esc(b.id)+'"><span>'+esc(kind(b).toUpperCase())+'</span>'+esc(raw(b).slice(0,125))+'</button>').join('');
- $('#screen').innerHTML='<div class="eyebrow">EDIÇÃO BIDIRECIONAL · CRAFT</div><h1>Estúdio editorial</h1><p class="muted">Edite blocos existentes, transforme um conceito em fluxo ou crie componentes visuais. As alterações são gravadas no documento original do Craft.</p><div class="toolbar"><button class="btn '+(S.editorMode==='edit'?'active':'')+'" id="tab-edit">Editar bloco</button><button class="btn '+(S.editorMode==='insert'?'active':'')+'" id="tab-insert">Criar prancha</button><button class="btn" id="back-atlas">Prévia do atlas</button></div>'+
+ $('#screen').innerHTML='<div class="eyebrow">EDIÇÃO BIDIRECIONAL · CRAFT</div><h1>Estúdio editorial</h1><p class="muted">Edite blocos existentes, transforme um conceito em fluxo ou crie componentes visuais. As alterações são gravadas no documento original do Craft.</p><div class="toolbar"><button class="btn '+(S.editorMode==='edit'?'active':'')+'" id="tab-edit">Editar bloco</button><button class="btn '+(S.editorMode==='insert'?'active':'')+'" id="tab-insert">Criar prancha</button><button class="btn" id="back-atlas">Prévia do atlas</button><label class="btn owner-file-label" for="studio-file">Inserir imagem</label><input type="file" id="studio-file" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="hide"></div>'+
  (S.editorMode==='edit'?'<div class="canvas"><div class="panel"><div class="eyebrow">BLOCOS DO DOCUMENTO</div><div class="editlist">'+options+'</div></div><div class="panel"><div class="eyebrow">EDIÇÃO SEM CÓDIGO</div><h3>Conteúdo selecionado</h3><textarea id="edit-text" class="field" rows="9" placeholder="Selecione um bloco"></textarea><label class="mini muted" for="format">Apresentação</label><select class="field" id="format"><option value="none">Texto / formato atual</option><option value="callout">Destaque editorial</option><option value="danger">Alerta científico</option><option value="flow">Fluxograma horizontal</option><option value="comparison">Comparação lado a lado</option><option value="question">Pergunta de recuperação ativa</option><option value="answer">Resposta oculta</option></select><div class="notice mini">Você altera o texto e escolhe a forma de apresentação. Ao salvar, a mesma informação permanece editável no Craft.</div><button class="btn primary" id="save">Salvar no Craft</button><div id="save-state" class="footer-note"></div></div></div>':
  '<div class="canvas"><div class="panel"><div class="eyebrow">MODELO DE PRANCHA</div><h3>Selecione a representação</h3><div class="pillset" id="templates"><button class="btn active" data-template="flow">Fluxograma</button><button class="btn" data-template="compare">Comparação</button><button class="btn" data-template="callout">Quadro clínico</button><button class="btn" data-template="question">Pergunta</button><button class="btn" data-template="text">Seção editorial</button></div><label for="new-name">Título</label><input id="new-name" class="field" value="Nova prancha visual"><label for="new-body">Conteúdo (edite como texto)</label><textarea id="new-body" class="field" rows="7"></textarea><p class="mini muted">Use uma seta → para separar etapas de um fluxo. Use | para comparar dois conceitos. Essas marcações são texto simples no Craft, não código.</p><button class="btn primary" id="create-visual">Inserir no Craft</button><p class="mini muted" id="create-state"></p></div><div class="panel"><div class="eyebrow">PRÉVIA DA ESTRUTURA</div><div id="template-preview"></div></div></div>')+
  '<div class="footer-note">Os arquivos de imagem devem ser inseridos como imagens nativas no Craft. O Studio recuperará sua URL e transparência sem recriá-los.</div>';
- $('#tab-edit').onclick=()=>{S.editorMode='edit';studio()};$('#tab-insert').onclick=()=>{S.editorMode='insert';studio()};$('#back-atlas').onclick=()=>{S.mode='atlas';navigate('atlas')};
+ $('#tab-edit').onclick=()=>{S.editorMode='edit';studio()};$('#tab-insert').onclick=()=>{S.editorMode='insert';studio()};$('#back-atlas').onclick=()=>{S.mode=S.settings?.view||'immersive';navigate('atlas')};
+ const imageFile=$('#studio-file');
+ if(imageFile)imageFile.onchange=async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  if(!S.docId||S.demo){inform('Abra um documento real antes de inserir uma imagem');return}
+  if(file.size>4*1024*1024){inform('Limite de 4 MB por figura');return}
+  if(!['image/png','image/jpeg','image/webp','image/svg+xml'].includes(file.type)){inform('Formato de imagem não aceito');return}
+  const label=$('.owner-file-label');if(label)label.textContent='Enviando para o Craft…';
+  try{
+   const uri=new URL('/api/craft',location.href);
+   uri.searchParams.set('op','upload');uri.searchParams.set('id',S.docId);uri.searchParams.set('position','end');uri.searchParams.set('name',file.name);
+   const response=await fetch(uri,{method:'POST',credentials:'same-origin',headers:{'Content-Type':file.type},body:file});
+   const data=await response.json().catch(()=>({}));if(!response.ok)throw Error(data.error||'Falha ao inserir figura');
+   await openDoc(S.docId);inform('Imagem inserida na nota do Craft, preservando o arquivo original');
+  }catch(err){inform('Imagem: '+err.message)}
+  finally{if(label)label.textContent='Inserir imagem'}
+ };
  if(S.editorMode==='edit'){
   $$('[data-edit]').forEach(b=>b.onclick=()=>{S.selected=b.dataset.edit;studio()});
   const block=blocks.find(b=>b.id===S.selected)||blocks[0];if(block){S.selected=block.id;$('#edit-text').value=raw(block);const pre=kind(block);$('#format').value=['callout','flow','comparison','question','answer'].includes(pre)?pre:'none';}
@@ -184,7 +201,7 @@ function controlPanel(){
  }
  $('#screen').innerHTML='<div class="panel"><div class="eyebrow">MEU ATLAS</div><h2>Carregando controles do Craft…</h2></div>';
  renderAdminConsole({
-   host:$('#screen'),api:API,settings:S.settings,
+   host:$('#screen'),api:API,settings:S.settings,startTab:S.adminStartTab||'library',
    onSaved:async settings=>{
      S.settings=settings;applyControlOptions();
      try{const d=await API('documents');S.docs=list(d)}catch(e){inform('Ajustes salvos; biblioteca temporariamente indisponível: '+e.message)}
@@ -192,7 +209,7 @@ function controlPanel(){
    onCreated:async()=>{
      try{const d=await API('documents');S.docs=list(d)}catch{}
    },
-   onExit:()=>navigate('library')
+   onExit:()=>{S.adminStartTab='library';navigate('library')}
  }).catch(e=>{
    $('#screen').innerHTML='<div class="panel"><div class="eyebrow">ADMINISTRAÇÃO</div><h2>Não foi possível abrir o painel.</h2><p class="muted">'+esc(e.message)+'</p><button class="btn" id="admin-try">Tentar novamente</button></div>';
    $('#admin-try').onclick=controlPanel;
