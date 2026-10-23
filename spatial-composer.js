@@ -160,7 +160,6 @@ export function openSpatialComposer({mount,project,config,demo=false,save,onStor
    byId('compose-fit').onclick=()=>{fit=true;resizeBoard()};
    byId('compose-zoom-in').onclick=()=>{fit=false;zoom=clampZoom(scale+.12);resizeBoard()};
    byId('compose-zoom-out').onclick=()=>{fit=false;zoom=clampZoom(scale-.12);resizeBoard()};
-   byId('compose-remove')?.onclick=()=>{};
    const remove=byId('compose-remove');if(remove)remove.onclick=()=>{active().nodes=active().nodes.filter(n=>n.id!==selected);selected='';schedule();draw()};
    const style=byId('component-style');if(style)style.onchange=e=>{let n=pick();if(n)mutateNode(n,{design:e.target.value})};
    root.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>add(b.dataset.add));
