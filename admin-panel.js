@@ -24,11 +24,11 @@ function catalogId(note,catalog){
  return catalog.find(d=>d.id===r.id||d.id===r.title||norm(d.title)===norm(r.title))?.id;
 }
 function el(id,host){return host.querySelector('#'+id)}
-export async function renderAdminConsole({host,api,settings,onSaved,onExit,onCreated}){
+export async function renderAdminConsole({host,api,settings,onSaved,onExit,onCreated,startTab='library'}){
  let cfg=settings||await api('control'),catalogData;
  try{catalogData=await api('catalog')}catch{catalogData={items:[]}}
  let catalog=Array.isArray(catalogData?.items)?catalogData.items:[];
- let draft={...cfg},password='',active='library',search='',libraryDirty=false,settingsDirty=false,busy=false,selectedIds=(cfg.visibleNotes||[]).map(s=>catalogId(s,catalog)).filter(Boolean);
+ let draft={...cfg},password='',active=startTab,search='',libraryDirty=false,settingsDirty=false,busy=false,selectedIds=(cfg.visibleNotes||[]).map(s=>catalogId(s,catalog)).filter(Boolean);
  let unresolved=(cfg.visibleNotes||[]).filter(s=>!catalogId(s,catalog));
  let notice='';
  const isOwner=()=>Boolean(cfg?.configured);
