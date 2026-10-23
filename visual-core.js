@@ -23,6 +23,8 @@ make('Fluxo: Avaliação clínica → Identificar gravidade → Artrocentese qua
 make('## Gota e CPPD','h2'),
 make('Comparação: Urato monossódico — cristais em agulha, birrefringência negativa forte | CPPD — cristais frequentemente romboides, birrefringência positiva fraca'),
 {id:'sample-table',type:'table',rows:[[{'value':'Achado'},{'value':'Interpretação'}],[{'value':'Urato sérico normal na crise'},{'value':'Não exclui gota'}],[{'value':'Cristais no líquido sinovial'},{'value':'Não excluem infecção concomitante'}]]},
+ {id:'sample-image-urate',type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/a/a9/Gout_-_monosodium_urate_crystals_%2820X%2C_polarized%2C_red_compensator%29.jpg',altText:'Cristais de urato monossódico sob luz polarizada, compensador vermelho, 20× — Gabriel Caponetti, Wikimedia Commons, CC BY-SA 3.0'},
+make('**Fonte da microfotografia:** Gabriel Caponetti, *Gout - monosodium urate crystals (20X, polarized, red compensator)*, Wikimedia Commons, CC BY-SA 3.0. Imagem real de demonstração; não pertence a um caso clínico do Craft.'),
 make('## Raciocínio ativo','h2'),
 make('Pergunta: Cristais identificados dispensam cultura se houver suspeita de artrite séptica?'),
 make('Resposta: Não. Artrite infecciosa e artrite por cristais podem coexistir.'),
