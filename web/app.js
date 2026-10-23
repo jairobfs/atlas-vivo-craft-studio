@@ -48,12 +48,12 @@
     });
   });
 
-  const names={inicio:'Visão geral',capitulos:'Capítulos ilustrados',sps:'Módulos SP1–SP4',atlas:'Atlas ilustrado','3d':'Laboratório 3D',clinica:'Laboratório clínico',prova:'Modo prova'};
+  const names={inicio:'Visão geral',capitulos:'Capítulos ilustrados',resumos:'Resumos visuais',sps:'Módulos SP1–SP4',atlas:'Atlas ilustrado','3d':'Laboratório 3D',clinica:'Laboratório clínico',prova:'Modo prova'};
   function go(page,updateHash=true){
     if(!names[page])page='inicio';
     document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${page}`));
     document.querySelectorAll('[data-page]').forEach(b=>{
-      const selected=b.dataset.page===page;b.classList.toggle('selected',selected);
+      const selected=b.dataset.page===page||(page==='resumos'&&b.dataset.page==='capitulos'&&!!b.closest('.mobile-nav'));b.classList.toggle('selected',selected);
       if(selected)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
     });
     document.getElementById('crumb-current').textContent=names[page];

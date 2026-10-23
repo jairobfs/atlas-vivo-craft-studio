@@ -1,7 +1,7 @@
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 const base=process.cwd();
-const files=['index.html','style.css','clinical-lab.css','clinical-lab.js','knowledge-panels.js','app.js','model3d.js','webgl3d.js','craft-sync.js','maneuver-engine.js','unified-data.js','mechanism-workbench.js','progress-transfer.js','favicon.svg','manifest.webmanifest','sw.js','apple-touch-icon.png'];
+const files=['index.html','style.css','clinical-lab.css','clinical-lab.js','knowledge-panels.js','app.js','model3d.js','webgl3d.js','craft-sync.js','maneuver-engine.js','unified-data.js','mechanism-workbench.js','progress-transfer.js','visual-summaries.js','visual-summaries.css','favicon.svg','manifest.webmanifest','sw.js','apple-touch-icon.png'];
 const assets=Object.fromEntries(await Promise.all(files.map(async file=>[`/${file}`,file.endsWith('.png')?{base64:(await readFile(join(base,'web',file))).toString('base64')}:await readFile(join(base,'web',file),'utf8')
 ])));
 const core=await readFile(join(base,'worker/index.js'),'utf8');

@@ -35,6 +35,7 @@
   </script>
     <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/clinical-lab.css">
+  <link rel="stylesheet" href="/visual-summaries.css">
 </head>
 <body>
   <div class="app-shell">
@@ -44,6 +45,7 @@
       <nav class="side-menu">
         <button data-page="inicio" class="nav-item selected"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3zM9 20v-6h6v6"/></svg></span> Visão geral</button>
         <button data-page="capitulos" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v17H6a2 2 0 0 0-2 2zM4 5v17m4-14h8m-8 4h8m-8 4h5"/></svg></span> Capítulos ilustrados</button>
+        <button data-page="resumos" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18H5zM9 7h6m-6 4h6m-6 4h4M3 7v11"/></svg></span> Resumos visuais</button>
         <button data-page="sps" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v16H4zm9 0h7v16h-7M7 8h1m8 0h1M7 12h1m8 0h1"/></svg></span> Módulos SP1–SP4</button>
         <button data-page="atlas" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M5 19c4-1 5-4 7-7s3-6 7-7"/></svg></span> Atlas ilustrado</button>
         <button data-page="3d" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zm0 10 9-5m-9 5L3 7m9 5v10"/></svg></span> Projetos 3D</button>
@@ -85,6 +87,7 @@
             <div class="chapter-home-grid"><button type="button" data-open-knowledge="sp1"><span>01 · SP1</span><b>Articulações</b><small>Sinóvia · tendão · triagem</small></button><button type="button" data-open-knowledge="sp2"><span>02 · SP2</span><b>Neuromuscular</b><small>Duchenne · diagnóstico</small></button><button type="button" data-open-knowledge="sp3"><span>03 · SP3</span><b>Trauma</b><small>Gustilo · consolidação</small></button><button type="button" data-open-knowledge="sp4"><span>04 · SP4</span><b>Oncologia</b><small>Imagem · biópsia</small></button></div>
           </section>
 
+          <button class="vs-home-promo" data-goto="resumos" type="button"><span><small>NOVA BIBLIOTECA EDITORIAL · SEIS RESUMOS</small><strong>Conteúdo médico em quadros, não em paredes de texto.</strong><em>Fluxogramas, diagramas, classificações, decisões e recuperação ativa em telas pensadas para o iPhone.</em></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5m3-4 4 4-4 4"/></svg></button>
           <section class="journey-shell" id="guided-journey" aria-label="Trilha de aprendizagem guiada">
             <div class="journey-heading"><div><span class="journey-eyebrow">TRILHA GUIADA · UCT20</span><h2>Seu próximo passo.</h2><p>Uma SP por vez, do conceito à recuperação ativa. Você escolhe o ritmo; o Atlas guarda onde parou neste aparelho.</p></div><div class="journey-progress-count" id="journey-count" aria-live="polite">0 de 5 etapas</div></div>
             <div class="journey-switch" id="journey-switch" role="group" aria-label="Selecionar situação-problema"><button type="button" data-journey-sp="sp1">SP1</button><button type="button" data-journey-sp="sp2">SP2</button><button type="button" data-journey-sp="sp3">SP3</button><button type="button" data-journey-sp="sp4">SP4</button></div>
@@ -123,6 +126,14 @@
           </section>
         </section>
 
+        <section id="page-resumos" class="page" aria-label="Resumos visuais e cadernos editoriais">
+          <header class="vs-hero"><span>SÍNTESES CIENTÍFICAS · EDIÇÃO VISUAL 2026</span><h1>Resumos para<br><em>raciocinar melhor.</em></h1><p>Seis cadernos originais baseados nos temas da UCT20: quadros clínicos, classificações, diagramas editáveis, perguntas comentadas e ligação imediata com a anatomia em 3D.</p><div class="vs-hero-tail"><span>SP1–SP4</span><span>6 resumos</span><span>Rigor clínico</span><span>Mobile-first</span></div></header>
+          <div class="vs-subnav"><div><h2>Escolha o tema</h2><small>Conteúdo reconstruído em seções nativas, não capturas de tela.</small></div><span id="visual-summary-progress" role="status" aria-live="polite">0 de 6 estudados</span></div>
+          <nav id="visual-summary-catalog" class="vs-catalog" aria-label="Selecionar resumo visual"></nav>
+          <article id="visual-summary-content" aria-label="Resumo visual selecionado"></article>
+          <div class="vs-bridge"><div><strong>Do quadro para a exposição aprofundada</strong><p>As sínteses são portas de entrada. A teoria completa, os modelos 3D, casos e questões permanecem conectados.</p></div><button type="button" data-goto="capitulos">Abrir capítulos completos →</button></div>
+        </section>
+
         <section id="page-sps" class="page" aria-label="Módulos SP">
           <div class="page-heading"><div class="kicker">TRILHA DE TUTORIA</div><h1>Quatro problemas.<br><em>Um mapa clínico.</em></h1><p>Leia a SP, explore suas estruturas tridimensionais e faça a conexão entre anatomia, mecanismo e raciocínio clínico. As notas originais ficam acessíveis no Craft; esta edição pública não sincroniza conteúdo privado.</p></div>
           <div class="knowledge-shortcut"><div><span>OUTRA FORMA DE APRENDER</span><strong>Os capítulos ilustrados agora têm uma biblioteca própria.</strong></div><button type="button" data-goto="capitulos">Abrir capítulos →</button></div>
@@ -144,6 +155,7 @@
 
         <section id="page-capitulos" class="page" aria-label="Capítulos médicos ilustrados">
           <header class="chapter-cover"><span class="chapter-cover-eyebrow">ATLAS VIVO · BIBLIOTECA VISUAL</span><h1>Medicina em<br><em>seções vivas.</em></h1><p>Aprenda por quadros ilustrados, processos em etapas, comparações e situações de decisão. Cada capítulo foi desenhado para o celular, com leitura contínua e figuras integradas.</p><div class="chapter-cover-metrics"><span><b>04</b> capítulos</span><span><b>SP1–SP4</b> conectadas</span><span><b>01</b> percurso</span></div></header>
+          <div class="vs-chapter-shortcut"><span>Prefere começar por esquemas e decisões rápidas, como nos seus resumos originais?</span><button type="button" data-goto="resumos">Abrir os 6 resumos visuais →</button></div>
           <div class="chapter-path" aria-label="Sequência sugerida de estudo"><span>01 · Observe</span><i aria-hidden="true">→</i><span>02 · Entenda</span><i aria-hidden="true">→</i><span>03 · Decida</span><i aria-hidden="true">→</i><span>04 · Revise</span></div>
           <div class="chapter-catalog-heading"><div class="kicker">ESCOLHA UM CADERNO</div><h2>Seu ponto de partida</h2><p>Toque em um tema para abrir os painéis logo abaixo. O capítulo escolhido permanece em destaque.</p></div>
           <div class="chapter-catalog" aria-label="Biblioteca de capítulos">
@@ -201,6 +213,7 @@
         </section>
 
         <section id="page-3d" class="page" aria-label="Laboratório 3D">
+          <div id="summary-return-banner" class="vs-chapter-shortcut" hidden><span>Você abriu esta cena a partir de um resumo visual.</span><button type="button" id="summary-return-button">Voltar ao resumo →</button></div>
           <div class="page-heading tight"><div class="kicker">EXPLORAÇÃO LIVRE · EXTENSÃO DAS SPS</div><h1>Veja por <em>outro ângulo.</em></h1><p>Sete projetos 3D integram os temas das SPs, incluindo uma cena original de osteomielite crônica. Gire, selecione estruturas, controle o movimento e exporte. São modelos esquemáticos, não peças anatômicas certificadas.</p></div>
           <div class="chapter-model-return" id="chapter-model-return" hidden>
               <div><span>VOCÊ VEIO DOS CAPÍTULOS</span><strong id="chapter-return-title">Continue sua explicação</strong></div>
@@ -285,5 +298,6 @@
   <script src="/app.js" defer></script>
   <script src="/craft-sync.js" defer></script>
   <script src="/progress-transfer.js" defer></script>
+  <script src="/visual-summaries.js" defer></script>
 </body>
 </html>

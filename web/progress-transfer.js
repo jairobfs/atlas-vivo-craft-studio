@@ -1,7 +1,7 @@
 /* Atlas Vivo V19 · local progress portability. No network calls. */
 (()=>{
  'use strict';
- const KEYS=['atlas-vivo-theme','atlas-vivo-quiz-v1','atlas-vivo-quiz-position-v1','atlas-vivo-learning-path-v1','atlas-vivo-chapter-progress-v1','atlas-vivo-clinical-v1'];
+ const KEYS=['atlas-vivo-theme','atlas-vivo-quiz-v1','atlas-vivo-quiz-position-v1','atlas-vivo-learning-path-v1','atlas-vivo-chapter-progress-v1','atlas-vivo-clinical-v1','atlas-vivo-summary-v1'];
  const exp=document.getElementById('progress-export'),imp=document.getElementById('progress-import'),fileInput=document.getElementById('progress-file'),summary=document.getElementById('progress-vault-summary'),feedback=document.getElementById('progress-vault-feedback');
  if(!exp||!imp||!fileInput||!summary||!feedback)return;
  const read=(key,fallback)=>{try{const raw=localStorage.getItem(key);return raw===null?fallback:JSON.parse(raw)}catch{return fallback}};
