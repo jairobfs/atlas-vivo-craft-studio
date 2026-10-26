@@ -8,6 +8,7 @@
     "dev": "node scripts/dev-worker.mjs",
     "start": "node scripts/render-server.mjs",
     "test": "node tests/atlas-smoke.mjs && node tests/mechanism-smoke.mjs && node tests/clinical-smoke.mjs",
-    "test:craft": "node tests/craft-worker-smoke.mjs"
+    "test:craft": "node tests/craft-worker-smoke.mjs",
+    "test:vercel": "node tests/vercel-deployment.mjs"
   }
 }
